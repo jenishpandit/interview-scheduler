@@ -37,7 +37,7 @@ const formSchema = z.object({
 export default function Page() {
 
   const router = useRouter()
-  // Initialize the form with useForm
+ 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,7 +54,7 @@ export default function Page() {
       }
     }, []);
 
-  // Define the submit handler
+ 
   const onSubmit = async (values: any) => {
     form.setValue("isSubmitting", true);
     try {
@@ -68,6 +68,8 @@ export default function Page() {
         }
       );
       localStorage.setItem('token', response.data.token);
+      console.log('token',response.data.token);
+      
       console.log('Login successful:', response.data);
       router.push('/dashboard');
     } catch (error) {
