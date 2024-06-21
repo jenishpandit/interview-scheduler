@@ -11,6 +11,7 @@ import { Table, TableCaption, TableHeader, TableBody, TableRow, TableHead, Table
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import axios, { AxiosResponse } from 'axios';
 import { FaEdit, FaEye, FaFileUpload, FaTrash } from "react-icons/fa";
+import { ImProfile } from "react-icons/im";
 
 import Link from 'next/link';
 import {
@@ -66,7 +67,7 @@ const Page: React.FC = () => {
 
     const fetchTechnologies = async () => {
         try {
-            const response: AxiosResponse<any[]> = await axios.get('http://localhost:4000/technologies');
+            const response: AxiosResponse<any[]> = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/technologies`);
             setTechnologies(response.data.data);
         } catch (error) {
             console.error('Error fetching technologies:', error);
@@ -79,7 +80,7 @@ const Page: React.FC = () => {
 
     const fetchCandidates = async () => {
         try {
-            const response: AxiosResponse<FormData[]> = await axios.get('http://localhost:4000/candidates');
+            const response: AxiosResponse<FormData[]> = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/candidates`);
             setCandidates(response.data.data);
         } catch (error) {
             console.error('Error fetching candidates:', error);
@@ -105,13 +106,13 @@ const Page: React.FC = () => {
             }
 
             if (editCandidateId) {
-                await axios.put(`http://localhost:4000/candidate/${editCandidateId}`, formData, {
+                await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/candidate/${editCandidateId}`, formData, {
                     headers: {
                         'Content-Type': 'form-data',
                     },
                 });
             } else {
-                await axios.post('http://localhost:4000/candidate', formData, {
+                await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/candidate`, formData, {
                     headers: {
                         'Content-Type': 'form-data',
                     },
@@ -130,7 +131,7 @@ const Page: React.FC = () => {
     const deleteCandidate = async () => {
         if (candidateToDelete) {
             try {
-                await axios.delete(`http://localhost:4000/candidate/${candidateToDelete}`);
+                await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/candidate/${candidateToDelete}`);
                 fetchCandidates();
                 setCandidateToDelete(null);
             } catch (error) {
@@ -301,7 +302,7 @@ const Page: React.FC = () => {
                                     {resumeFile ? (
                                         <div className="flex items-center">
                                             {typeof resumeFile === 'string' ? (
-                                                <Link href={`http://localhost:4000/${resumeFile}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                                                <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${resumeFile}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                                                     <FaFileUpload className="text-gray-600 mr-2 text-2xl" />
                                                 </Link>
                                             ) : (
@@ -336,7 +337,7 @@ const Page: React.FC = () => {
 
             <Table>
 
-                <TableHeader>
+                <TableHeader className='bg-gray-200'>
                     <TableRow>
                         <TableHead>First Name</TableHead>
                         <TableHead>Last Name</TableHead>
@@ -360,7 +361,7 @@ const Page: React.FC = () => {
                             <TableCell>{candidate.type}</TableCell>
                             <TableCell>
                                 {candidate.resume && (
-                                    <Link href={`http://localhost:4000/${candidate.resume}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                                    <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                                         <FaEye className='text-xl text-slate-800' />
                                     </Link>
                                 )}
@@ -368,7 +369,7 @@ const Page: React.FC = () => {
                             <TableCell>
                                 <div className="flex space-x-2">
                                     <FaEdit
-                                        className="text-gray-500 text-xl text-blue-600 cursor-pointer"
+                                        className=" text-xl text-blue-600 cursor-pointer"
                                         onClick={() => editCandidate(candidate._id)}
                                     />
                                     <AlertDialog>
@@ -390,7 +391,7 @@ const Page: React.FC = () => {
                             <TableCell>
                                 <Link href={`/candidates/${candidate._id}`} passHref
                                      className="text-blue-500 underline"  rel="noopener noreferrer">
-                                        <FaEye className="text-xl text-slate-800" />
+                                        <ImProfile  className="text-2xl text-slate-800" />
                                     
                                 </Link>
                             </TableCell>

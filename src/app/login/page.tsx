@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,12 +6,10 @@ import axios from "axios";
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react';
 
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
-
+// Schema validation
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).min(1, {
     message: "Email is required",
@@ -35,9 +32,8 @@ const formSchema = z.object({
 });
 
 export default function Page() {
-
-  const router = useRouter()
- 
+  const router = useRouter();
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,20 +42,20 @@ export default function Page() {
     },
   });
 
-    
-    useEffect(() => {
-      const isAuthenticated = localStorage.getItem('token'); 
-      if (isAuthenticated) {
-        router.push('/dashboard'); 
-      }
-    }, []);
+  // Check if the user is authenticated
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('token'); 
+    if (isAuthenticated) {
+      router.push('/dashboard'); 
+    }
+  }, [router]);
 
- 
+  // Form submission handler
   const onSubmit = async (values: any) => {
     form.setValue("isSubmitting", true);
     try {
       const response = await axios.post(
-        'http://localhost:4000/login',
+        `${process.env.NEXT_PUBLIC_API_URL}/login`,
         values,
         {
           headers: {
@@ -68,9 +64,6 @@ export default function Page() {
         }
       );
       localStorage.setItem('token', response.data.token);
-      console.log('token',response.data.token);
-      
-      console.log('Login successful:', response.data);
       router.push('/dashboard');
     } catch (error) {
       console.error('There was an error!', error.response.data);
@@ -79,7 +72,6 @@ export default function Page() {
       form.setValue("isSubmitting", false);
     }
   };
-  
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-100">

@@ -59,7 +59,7 @@ const Page: React.FC = () => {
 
   const fetchTechnologies = async () => {
     try {
-      const response = await axios.get<{ data: Technology[] }>("http://localhost:4000/technologies");
+      const response = await axios.get<{ data: Technology[] }>(`${process.env.NEXT_PUBLIC_API_URL}/technologies`);
       console.log("Fetched technologies:", response.data.data);
       setTechnologies(response.data.data);
     } catch (error) {
@@ -104,7 +104,7 @@ const Page: React.FC = () => {
   const addTechnology = async (data: { technology_name: string }) => {
     try {
       const response = await axios.post<{ data: Technology }>(
-        "http://localhost:4000/technology",
+        `${process.env.NEXT_PUBLIC_API_URL}/technology`,
         { technology_name: data.technology_name },
         {
           headers: {
@@ -125,7 +125,7 @@ const Page: React.FC = () => {
 
     try {
       await axios.put<{ data: Technology }>(
-        `http://localhost:4000/technology/${editingTechnology._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/technology/${editingTechnology._id}`,
         { technology_name: data.technology_name },
         {
           headers: {
@@ -145,7 +145,7 @@ const Page: React.FC = () => {
     if (!technologyToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:4000/technology/${technologyToDelete._id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/technology/${technologyToDelete._id}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -213,20 +213,20 @@ const Page: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="overflow-x-auto bg-gray-100 p-4 rounded-lg">
+      <div className="overflow-x-auto bg-gray-100 p-1 rounded-lg">
         <Table className="min-w-full divide-y divide-gray-200">
-          <TableHead className="bg-gray-50">
+          <TableHead className="bg-gray-200">
           <TableRow className=''>
-                        <TableCell className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Technology Name</TableCell>
+                        <TableCell className=" text-left text-xs font-medium text-gray-500 uppercase">Technology Name</TableCell>
 
                     </TableRow>
                 </TableHead>
-                <TableHead className="bg-gray-50">
+                <TableHead className="bg-gray-200">
                     <TableRow className=''>
 
-                        <TableCell className="px-16 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</TableCell>
+                        <TableCell className="px-10  text-right text-xs font-medium text-gray-500 uppercase">Action</TableCell>
                     </TableRow>
-          </TableHead>
+          </TableHead >
           <TableBody className="bg-white divide-y divide-gray-200">
             {technologies.length > 0 ? (
               technologies.map((technology) => (
@@ -235,7 +235,7 @@ const Page: React.FC = () => {
                   <TableCell className="px-6 py-4 whitespace-nowrap space-x-2">
                     <Button className="px-3 py-1 rounded-md bg-transparent hover:bg-transparent text-blue-600" onClick={() => handleEdit(technology)}>
                     <FaEdit  className='m-2 text-lg'/></Button>
-                    <Button className="px-3 py-1 rounded-md bg-transparent text-red-600" onClick={() => { setTechnologyToDelete(technology); setDeleteDialogOpen(true); }}>
+                    <Button className="px-3 py-1 rounded-md bg-transparent text-red-600 hover:bg-transparent" onClick={() => { setTechnologyToDelete(technology); setDeleteDialogOpen(true); }}>
                     <FaTrash className='m-1 text-lg'/></Button>
                   </TableCell>
                 </TableRow>
