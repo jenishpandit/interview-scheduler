@@ -1,9 +1,9 @@
 "use client"
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import axios from '../../lib/axios'; 
-import { FaEye } from 'react-icons/fa';
+import axios from '../../lib/axios';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Candidate {
   _id: string;
@@ -18,9 +18,8 @@ interface Candidate {
 }
 
 const CandidateDetailsPage = () => {
-  const  { id } = useParams();
+  const { id } = useParams();
 
-  
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,12 +29,11 @@ const CandidateDetailsPage = () => {
     }
   }, [id]);
 
-  const fetchCandidateDetails:any = async (candidateId: string) => {
+  const fetchCandidateDetails = async (candidateId: string) => {
     try {
       const response = await axios.get(`/candidate/read/${candidateId}`);
       const candidateData = response.data.data;
 
-     
       const technologyResponse = await axios.get(`/technology/read/${candidateData.technology_id}`);
       const technologyName = technologyResponse.data.data.technology_name;
 
@@ -45,54 +43,62 @@ const CandidateDetailsPage = () => {
       });
     } catch (error) {
       console.error('Error fetching candidate details:', error);
+      setCandidate(null);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   if (!candidate) {
-    return <div>Candidate not found.</div>;
+    return <div className="flex justify-center items-center h-screen">Candidate not found.</div>;
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Candidate Details</h1>
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="mb-4">
-          <label className="font-semibold">First Name:</label>
-          <p>{candidate.first_name}</p>
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Last Name:</label>
-          <p>{candidate.last_name}</p>
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Email:</label>
-          <p>{candidate.email}</p>
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Phone Number:</label>
-          <p>{candidate.phone_number}</p>
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Technology:</label>
-          <p>{candidate.technology_name}</p>
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Type:</label>
-          <p>{candidate.type}</p>
-        </div>
-        <div className="mb-4">
-          <label className="font-semibold">Resume:</label>
-          {candidate.resume && (
-            <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`} target="_blank" rel="" className="text-blue-500 underline">
-              <FaEye className='text-xl text-slate-800' />
-          </Link>
-          )}
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Candidate Details</h1>
+      <div className="bg-gray-200 shadow-lg rounded-lg p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">First Name:</label>
+            <p className="text-gray-900">{candidate.first_name}</p>
+          </div>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">Last Name:</label>
+            <p className="text-gray-900">{candidate.last_name}</p>
+          </div>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">Email:</label>
+            <p className="text-gray-900">{candidate.email}</p>
+          </div>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">Phone Number:</label>
+            <p className="text-gray-900">{candidate.phone_number}</p>
+          </div>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">Technology:</label>
+            <p className="text-gray-900">{candidate.technology_name}</p>
+          </div>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">Job Type:</label>
+            <p className="text-gray-900">{candidate.type}</p>
+          </div>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700">Resume:</label>
+            {candidate.resume && (
+              <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`} target="_blank" rel="noopener noreferrer">
+                <Image
+                  src="/resume.png"
+                  width={40}
+                  height={40}
+                  alt="Resume"
+                />
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

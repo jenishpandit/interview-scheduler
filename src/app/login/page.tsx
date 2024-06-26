@@ -1,4 +1,5 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,7 +21,6 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
-// Schema validation
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).min(1, {
     message: "Email is required",
@@ -44,38 +44,30 @@ export default function Page() {
     },
   });
 
-  // Check if the user is authenticated
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('token'); 
-    if (isAuthenticated) {
+    const token = localStorage.getItem('token'); 
+    if (token) {
       router.push('/dashboard'); 
     }
   }, [router]);
 
-  // Form submission handler
   const onSubmit = async (values: any) => {
-    form.setValue("isSubmitting", true);
     try {
       const response = await axios.post('/auth/login', values);
       localStorage.setItem('token', response.data.data.token);
       toast({
         description: "Login successful",
         className: "toast-custom",
-       
       });
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 1000); 
+      router.push('/dashboard');
     } catch (error) {
-      console.error('There was an error!', error.response.data);
+      console.error('There was an error!', error);
       form.setError("password", { type: "manual", message: "Invalid email or password" });
-    } finally {
-      form.setValue("isSubmitting", false);
     }
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-gray-100">
+    <main className="flex items-center justify-center mt-32">
       <Card className="w-full max-w-md p-8 space-y-6 bg-white shadow-md">
         <h2 className="text-2xl font-semibold text-center">Login</h2>
         <Form {...form}>

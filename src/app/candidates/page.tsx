@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableCaption, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FaEdit, FaEye, FaFileUpload, FaTrash } from "react-icons/fa";
-import { ImProfile } from "react-icons/im";
+import Image from 'next/image';
 
 
 import Link from 'next/link';
@@ -112,7 +112,7 @@ const Page: React.FC = () => {
                     headers: {
                         'Content-Type': 'form-data',
                     },
-                }); 
+                });
             } else {
                 await axios.post(`/candidate/create`, formData, {
                     headers: {
@@ -310,7 +310,7 @@ const Page: React.FC = () => {
                                             ) : (
                                                 <span>{resumeFile.name}</span>
                                             )}
-                                            <Button variant="secondary" className="ml-2" onClick={handleDeleteResume}>
+                                            <Button variant="secondary" className="ml-2 hover:bg-gray-200" onClick={handleDeleteResume}>
                                                 Delete
                                             </Button>
                                         </div>
@@ -364,7 +364,14 @@ const Page: React.FC = () => {
                             <TableCell>
                                 {candidate.resume && (
                                     <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                                        <FaEye className='text-xl text-slate-800' />
+                                        <Image
+                                            src="/resume.png"
+                                            width={30}
+                                            height={40}
+                                            alt=""
+                                            className='ml-2'
+                                            
+                                        />
                                     </Link>
                                 )}
                             </TableCell>
@@ -392,7 +399,7 @@ const Page: React.FC = () => {
                             </TableCell>
                             <TableCell>
                                 <Link href={`/candidates/${candidate._id}`} passHref>
-                                    <ImProfile className="text-xl cursor-pointer" />
+                                <FaEye className='text-2xl text-slate-800' />
                                 </Link>
                             </TableCell>
                         </TableRow>
