@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../lib/axios";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { FaEdit , FaTrash} from "react-icons/fa";
- 
 
 interface Technology {
   _id: string;
@@ -59,7 +58,7 @@ const Page: React.FC = () => {
 
   const fetchTechnologies = async () => {
     try {
-      const response = await axios.get<{ data: Technology[] }>(`${process.env.NEXT_PUBLIC_API_URL}/technologies`);
+      const response = await axios.get<{ data: Technology[] }>(`/technology/readAll`);
       console.log("Fetched technologies:", response.data.data);
       setTechnologies(response.data.data);
     } catch (error) {
@@ -74,7 +73,6 @@ const Page: React.FC = () => {
 
   const onSubmit = async (data: { technology_name: string }) => {
     try {
-   
       const isDuplicate = technologies.some(
         (tech) => tech.technology_name.toLowerCase() === data.technology_name.toLowerCase()
       );
@@ -104,13 +102,8 @@ const Page: React.FC = () => {
   const addTechnology = async (data: { technology_name: string }) => {
     try {
       const response = await axios.post<{ data: Technology }>(
-        `${process.env.NEXT_PUBLIC_API_URL}/technology`,
-        { technology_name: data.technology_name },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        `/technology/create`,
+        { technology_name: data.technology_name }
       );
       console.log("Response after adding technology:", response.data.data);
       fetchTechnologies();
@@ -125,13 +118,8 @@ const Page: React.FC = () => {
 
     try {
       await axios.put<{ data: Technology }>(
-        `${process.env.NEXT_PUBLIC_API_URL}/technology/${editingTechnology._id}`,
-        { technology_name: data.technology_name },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        `/technology/update/${editingTechnology._id}`,
+        { technology_name: data.technology_name }
       );
       setEditingTechnology(null);
       fetchTechnologies();
@@ -145,11 +133,7 @@ const Page: React.FC = () => {
     if (!technologyToDelete) return;
 
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/technology/${technologyToDelete._id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.delete(`/technology/delete/${technologyToDelete._id}`);
       setTechnologyToDelete(null);
       setDeleteDialogOpen(false);
       fetchTechnologies();
@@ -172,7 +156,6 @@ const Page: React.FC = () => {
     setDuplicateError(null); 
     clearErrors();
   };
-
 
   return (
     <>
@@ -226,7 +209,7 @@ const Page: React.FC = () => {
 
                         <TableCell className="px-10  text-right text-xs font-medium text-gray-500 uppercase">Action</TableCell>
                     </TableRow>
-          </TableHead >
+          </TableHead>
           <TableBody className="bg-white divide-y divide-gray-200">
             {technologies.length > 0 ? (
               technologies.map((technology) => (
@@ -234,9 +217,11 @@ const Page: React.FC = () => {
                   <TableCell className="px-6 py-4 whitespace-nowrap">{technology.technology_name}</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap space-x-2">
                     <Button className="px-3 py-1 rounded-md bg-transparent hover:bg-transparent text-blue-600" onClick={() => handleEdit(technology)}>
-                    <FaEdit  className='m-2 text-lg'/></Button>
+                      <FaEdit className="m-2 text-lg" />
+                    </Button>
                     <Button className="px-3 py-1 rounded-md bg-transparent text-red-600 hover:bg-transparent" onClick={() => { setTechnologyToDelete(technology); setDeleteDialogOpen(true); }}>
-                    <FaTrash className='m-1 text-lg'/></Button>
+                      <FaTrash className="m-1 text-lg" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -256,11 +241,16 @@ const Page: React.FC = () => {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure delete this technology?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure you want to delete this technology?</AlertDialogTitle>
+              <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDelete}>Delete</AlertDialogAction>
+              <AlertDialogCancel asChild>
+                <Button className="text-black" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+              </AlertDialogCancel>
+              <AlertDialogAction asChild>
+                <Button onClick={handleDelete} className="bg-red-600 hover:bg-red-500 text-white">Delete</Button>
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

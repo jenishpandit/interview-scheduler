@@ -2,9 +2,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import axios from "axios";
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import axios from "../lib/axios";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 // Schema validation
 const formSchema = z.object({
@@ -33,7 +34,8 @@ const formSchema = z.object({
 
 export default function Page() {
   const router = useRouter();
-  
+  const { toast } = useToast();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,17 +56,16 @@ export default function Page() {
   const onSubmit = async (values: any) => {
     form.setValue("isSubmitting", true);
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/login`,
-        values,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      localStorage.setItem('token', response.data.token);
-      router.push('/dashboard');
+      const response = await axios.post('/auth/login', values);
+      localStorage.setItem('token', response.data.data.token);
+      toast({
+        description: "Login successful",
+        className: "toast-custom",
+       
+      });
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000); 
     } catch (error) {
       console.error('There was an error!', error.response.data);
       form.setError("password", { type: "manual", message: "Invalid email or password" });
