@@ -73,6 +73,17 @@
   font-size: large;
 }
 
+.toast-success{
+  background-color: green;
+  color: white;
+  font-size: large;
+}
+
+.toast-warning{
+  background-color: red;
+  color: white;
+  font-size: large;
+}
 
   @layer base {
     * {

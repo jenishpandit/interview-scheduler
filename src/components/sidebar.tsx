@@ -44,7 +44,7 @@ const Sidebar = () => {
             <div
               className={cn(
                 "mb-4 p-2 flex items-center hover:bg-gray-700 rounded",
-                pathname === "/candidates" && "bg-gray-700"
+                pathname.startsWith("/candidates") && "bg-gray-700"
               )}
             >
               <FaUser className="mr-2" /> Candidates

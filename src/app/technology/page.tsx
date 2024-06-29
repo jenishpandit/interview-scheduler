@@ -28,6 +28,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { FaEdit , FaTrash} from "react-icons/fa";
+import { useToast } from "@/components/ui/use-toast";
+
 
 interface Technology {
   _id: string;
@@ -46,6 +48,8 @@ const Page: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [technologyToDelete, setTechnologyToDelete] = useState<Technology | null>(null);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const { toast } = useToast();
+
 
   const form = useForm({
     resolver: zodResolver(AddTechnologySchema),
@@ -58,12 +62,17 @@ const Page: React.FC = () => {
 
   const fetchTechnologies = async () => {
     try {
-      const response = await axios.get<{ data: Technology[] }>(`/technology/readAll`);
+      const response = await axios.get<{ data: Technology[] }>(`/technology`);
       console.log("Fetched technologies:", response.data.data);
       setTechnologies(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch technologies");
+      toast({
+        title: "Error",
+        description: "Failed to fetch technologies",
+        status: "error",
+      });
     }
   };
 
@@ -95,21 +104,31 @@ const Page: React.FC = () => {
       fetchTechnologies();
     } catch (error) {
       console.error("Error submitting form:", error);
-      setError("Failed to submit form");
+      toast({
+        title: "Error",
+        description: "Failed to submit form",
+        status: "error",
+      });
     }
   };
 
   const addTechnology = async (data: { technology_name: string }) => {
     try {
       const response = await axios.post<{ data: Technology }>(
-        `/technology/create`,
+        `/technology`,
         { technology_name: data.technology_name }
       );
       console.log("Response after adding technology:", response.data.data);
       fetchTechnologies();
+      toast({
+        title: response.data.message,
+        className:"toast-success",
+      });
     } catch (error) {
       console.error("Error adding technology:", error);
-      setError("Failed to add technology");
+      toast({
+       error
+      });
     }
   };
 
@@ -117,15 +136,27 @@ const Page: React.FC = () => {
     if (!editingTechnology) return;
 
     try {
-      await axios.put<{ data: Technology }>(
-        `/technology/update/${editingTechnology._id}`,
+     const response =  await axios.put<{ data: Technology }>(
+        `/technology/${editingTechnology._id}`,
         { technology_name: data.technology_name }
       );
+      console.log("Response after update technology:", response.data.data);
       setEditingTechnology(null);
       fetchTechnologies();
+      toast({
+        title:response.data.message,
+        className:"toast-success",
+
+      });
     } catch (error) {
       console.error("Error updating technology:", error);
       setError("Failed to update technology");
+      toast({
+        title: "Error",
+        description: "Failed to update technology",
+        className:"toast-warning",
+        status: "error",
+      });
     }
   };
 
@@ -133,13 +164,24 @@ const Page: React.FC = () => {
     if (!technologyToDelete) return;
 
     try {
-      await axios.delete(`/technology/delete/${technologyToDelete._id}`);
+     const response = await axios.delete(`/technology/${technologyToDelete._id}`);
+      console.log("Response after delete technology:", response.data.data);
       setTechnologyToDelete(null);
       setDeleteDialogOpen(false);
       fetchTechnologies();
+      toast({
+        title: response.data.message,
+        className:"toast-success",
+
+      });
     } catch (error) {
       console.error("Error deleting technology:", error);
-      setError("Failed to delete technology");
+      toast({
+        title: "Error",
+        description: "Failed to delete technology",
+        className:"toast-warning",
+        status: "error",
+      });
     }
   };
 
@@ -150,10 +192,10 @@ const Page: React.FC = () => {
   };
 
   const handleAddTechnology = () => {
-    reset(); 
-    setEditingTechnology(null); 
-    setDialogOpen(true); 
-    setDuplicateError(null); 
+    reset();
+    setEditingTechnology(null);
+    setDialogOpen(true);
+    setDuplicateError(null);
     clearErrors();
   };
 
@@ -216,11 +258,11 @@ const Page: React.FC = () => {
                 <TableRow key={technology._id}>
                   <TableCell className="px-6 py-4 whitespace-nowrap">{technology.technology_name}</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap space-x-2">
-                    <Button className="px-3 py-1 rounded-md bg-transparent hover:bg-transparent text-blue-600" onClick={() => handleEdit(technology)}>
-                      <FaEdit className="m-2 text-lg" />
+                    <Button variant="outline"  size="icon" className="px-3 py-1 rounded-md   text-blue-600" onClick={() => handleEdit(technology)}>
+                      <FaEdit  className=" text-blue-600 hover:text-blue-600 text-lg" />
                     </Button>
-                    <Button className="px-3 py-1 rounded-md bg-transparent text-red-600 hover:bg-transparent" onClick={() => { setTechnologyToDelete(technology); setDeleteDialogOpen(true); }}>
-                      <FaTrash className="m-1 text-lg" />
+                    <Button variant="outline"  size="icon" className="px-3 py-1 rounded-md  text-red-600 hover:text-red-600" onClick={() => { setTechnologyToDelete(technology); setDeleteDialogOpen(true); }}>
+                      <FaTrash className="" />
                     </Button>
                   </TableCell>
                 </TableRow>

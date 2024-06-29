@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import axios from '../lib/axios';
 import { AxiosResponse } from 'axios';
+import { useToast } from "@/components/ui/use-toast";
+
 
 const schema = z.object({
     firstName: z.string().min(1, "First Name is required"),
@@ -53,12 +55,22 @@ const schema = z.object({
     technology_id: z.string().min(1, "Please choose an option"),
 });
 
+const defaultValues = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    resume: '',
+    jobType: '',
+    technology_id: '',
+}
+
 type FormData = z.infer<typeof schema>;
 
 const Page: React.FC = () => {
     const { register, handleSubmit, formState: { errors }, reset, control, setValue } = useForm<FormData>({
         resolver: zodResolver(schema),
-        defaultValues: { jobType: '', technology_id: '' },
+        defaultValues,
     });
     const [candidates, setCandidates] = useState<FormData[]>([]);
     const [technologies, setTechnologies] = useState<any[]>([]);
@@ -66,13 +78,20 @@ const Page: React.FC = () => {
     const [editCandidateId, setEditCandidateId] = useState<string | null>(null);
     const [candidateToDelete, setCandidateToDelete] = useState<string | null>(null);
     const [resumeFile, setResumeFile] = useState<string | File | null>(null);
+    const { toast } = useToast();
+
 
     const fetchTechnologies = async () => {
         try {
-            const response: AxiosResponse<any[]> = await axios.get(`/technology/readAll`);
+            const response: AxiosResponse<any[]> = await axios.get(`/technology`);
             setTechnologies(response.data.data);
         } catch (error) {
             console.error('Error fetching technologies:', error);
+            toast({
+                title: "Error fetching Candidates",
+                className:"toast-warning",
+                
+            });
         }
     };
 
@@ -82,10 +101,15 @@ const Page: React.FC = () => {
 
     const fetchCandidates = async () => {
         try {
-            const response: AxiosResponse<FormData[]> = await axios.get(`/candidate/readAll`);
+            const response: AxiosResponse<FormData[]> = await axios.get(`/candidate`);
             setCandidates(response.data.data);
         } catch (error) {
             console.error('Error fetching candidates:', error);
+            toast({
+                title: "Error fetching Candidates",
+                className:"toast-warning",
+                
+            });
         }
     };
 
@@ -108,16 +132,24 @@ const Page: React.FC = () => {
             }
 
             if (editCandidateId) {
-                await axios.put(`/candidate/update/${editCandidateId}`, formData, {
+              const response = await axios.put(`/candidate/${editCandidateId}`, formData, {
                     headers: {
                         'Content-Type': 'form-data',
                     },
                 });
+                toast({
+                    title: response.data.message,
+                    className:"toast-success",
+                });
             } else {
-                await axios.post(`/candidate/create`, formData, {
+             const response  = await axios.post(`/candidate`, formData, {
                     headers: {
                         'Content-Type': 'form-data',
                     },
+                });
+                toast({
+                    title: response.data.message,
+                    className:"toast-success",
                 });
             }
 
@@ -127,17 +159,30 @@ const Page: React.FC = () => {
             setEditCandidateId(null);
         } catch (error) {
             console.error('Error adding/updating candidate:', error);
+            toast({
+                title: "Error adding/updating candidate",
+                className:"toast-warning",
+            });
         }
     };
 
     const deleteCandidate = async () => {
         if (candidateToDelete) {
             try {
-                await axios.delete(`/candidate/delete/${candidateToDelete}`);
+            const response = await axios.delete(`/candidate/${candidateToDelete}`);
+                toast({
+                    title: response.data,
+                    className:"toast-warning",
+
+                });
                 fetchCandidates();
                 setCandidateToDelete(null);
             } catch (error) {
                 console.error('Error deleting candidate:', error);
+                toast({
+                    title: "Error deleting candidate",
+                    className:"toast-warning",
+                });
             }
         }
     };
@@ -149,7 +194,7 @@ const Page: React.FC = () => {
             setValue('lastName', candidate.last_name);
             setValue('email', candidate.email);
             setValue('phone', candidate.phone_number);
-            setValue('technology_id', candidate.technology_id);
+            setValue('technology_id', candidate.technology._id);
             setValue('jobType', candidate.type);
             setValue('resume', candidate.resume);
             setResumeFile(candidate.resume);
@@ -183,7 +228,7 @@ const Page: React.FC = () => {
                         <DialogTrigger className="btn btn-primary px-4 py-2 bg-slate-800 text-white p-2 rounded-xl" onClick={handleAddCandidate}>
                             + Add Candidate
                         </DialogTrigger>
-                        <DialogContent className="p-6 rounded-lg shadow-lg overflow-scroll">
+                        <DialogContent className="p-6 rounded-lg shadow-lg ">
                             <DialogHeader>
                                 <DialogTitle>{editCandidateId ? 'Edit Candidate' : 'Add Candidate'}</DialogTitle>
                             </DialogHeader>
@@ -359,7 +404,7 @@ const Page: React.FC = () => {
                             <TableCell>{candidate.last_name}</TableCell>
                             <TableCell>{candidate.email}</TableCell>
                             <TableCell>{candidate.phone_number}</TableCell>
-                            <TableCell>{candidate.candidate_technology}</TableCell>
+                            <TableCell>{candidate.technology.technology_name}</TableCell>
                             <TableCell>{candidate.type}</TableCell>
                             <TableCell>
                                 {candidate.resume && (
@@ -370,20 +415,24 @@ const Page: React.FC = () => {
                                             height={40}
                                             alt=""
                                             className='ml-2'
-                                            
+
                                         />
                                     </Link>
                                 )}
                             </TableCell>
                             <TableCell>
                                 <div className="flex space-x-2">
-                                    <FaEdit
-                                        className=" text-xl text-blue-600 cursor-pointer"
+                                    <Button variant="outline"  size="icon" className="text-blue-600 hover:text-blue-600"><FaEdit
+                                        className=" "
                                         onClick={() => editCandidate(candidate._id)}
-                                    />
+                                    /></Button>
+                                    
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <FaTrash className="text-red-500 text-xl cursor-pointer" onClick={() => setCandidateToDelete(candidate._id)} />
+                                            <Button variant="outline" className="text-red-600 hover:text-red-600" size="icon">
+                                            <FaTrash  onClick={() => setCandidateToDelete(candidate._id)} />
+                                            </Button>
+                                           
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
@@ -399,7 +448,7 @@ const Page: React.FC = () => {
                             </TableCell>
                             <TableCell>
                                 <Link href={`/candidates/${candidate._id}`} passHref>
-                                <FaEye className='text-2xl text-slate-800' />
+                                    <FaEye className='text-2xl text-slate-800' />
                                 </Link>
                             </TableCell>
                         </TableRow>
