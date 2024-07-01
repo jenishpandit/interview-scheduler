@@ -42,7 +42,7 @@ const page = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 ">
           <DashbordCard
             title="Candidate Total"
-            value={dashboard?.candidateTotal}
+            value ={ dashboard?.candidateTotal}
             Icon={<User />}
           ></DashbordCard>
           <DashbordCard

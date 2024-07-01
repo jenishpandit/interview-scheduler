@@ -54,7 +54,10 @@ export default function Page() {
   const onSubmit = async (values: any) => {
     try {
       const response = await axios.post('/auth/login', values);
+      console.log(response);
+      
       localStorage.setItem('token', response.data.data.token);
+      localStorage.setItem('id' ,response.data.data.user._id);
       toast({
         description: "Login successful",
         className: "toast-custom",

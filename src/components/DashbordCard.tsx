@@ -22,9 +22,7 @@ const DashbordCard: React.FC<DashboardCardProps> = ({ title, value, Icon }) => {
         {Icon}
       </CardHeader>
       <CardContent>
-        <CardTitle className="text-2xl font-bold">
-          {value}
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold">{value}</CardTitle>
       </CardContent>
     </Card>
   );

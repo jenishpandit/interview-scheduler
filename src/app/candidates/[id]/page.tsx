@@ -92,6 +92,8 @@ const CandidateDetailsPage = () => {
     try {
       const response = await axios.get(`/interview`);
       const interviewData = response.data.data;
+      console.log(interviewData);
+      
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
@@ -138,14 +140,15 @@ const CandidateDetailsPage = () => {
 
       }
     } else {
-
+      
       try {
+        const userId = localStorage.getItem('id'); 
         const response = await axios.post(`/interview`, {
           candidate_id: candidate._id,
           interview_date: data.interview_date,
           interview_type: data.interview_type,
           location: data.location,
-          created_by: "admin"
+          created_by: userId,
         });
         console.log("Interview Created:", response.data.data);
         toast({
