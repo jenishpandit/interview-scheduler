@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { Cpu, Laptop, User } from "lucide-react";
 import axios from "../lib/axios";
 import DashbordCard from "@/components/DashbordCard";
+import TodayInterview from "@/components/todayinterview";
 
 type DashboardData = {
   candidateTotal: number;
@@ -57,6 +58,8 @@ const page = () => {
           ></DashbordCard>
         </div>
       </div>
+
+      <TodayInterview></TodayInterview>
     </>
   );
 };

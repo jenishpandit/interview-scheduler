@@ -93,7 +93,12 @@ const CandidateDetailsPage = () => {
 
   const fetchInterviews = async (candidateId: string) => {
     try {
-      const response = await axios.get(`/interview`);
+      console.log(candidateId);
+      
+      const response = await axios.get(`/interview/${candidateId}`,);
+
+      console.log( "response = " ,response);
+      
       const interviewData = response.data.data;
       console.log(interviewData);
       
