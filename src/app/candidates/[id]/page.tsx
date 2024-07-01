@@ -4,16 +4,35 @@ import { useParams } from "next/navigation";
 import axios from "../../lib/axios";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "@/components/ui/select";
-import moment from 'moment';
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+} from "@/components/ui/select";
+import moment from "moment";
 import { FaEdit, FaTrash, FaPlusCircle } from "react-icons/fa";
-import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import {
+  Table,
+  TableCaption,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { Activity } from 'lucide-react';
+import { Activity } from "lucide-react";
 
 import {
   AlertDialog,
@@ -27,8 +46,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import NoteManager from "@/components/NoteManager";
 
 
 interface ICandidate {
@@ -55,7 +72,7 @@ interface IInterview {
 const interviewSchema: any = z.object({
   interview_date: z.string().nonempty("Interview date is required"),
   interview_type: z.string().min(2, "Please choose an option"),
-  location: z.string().nonempty("Please enter your location")
+  location: z.string().nonempty("Please enter your location"),
 });
 
 type InterviewFormValues = z.infer<typeof interviewSchema>;
@@ -65,12 +82,15 @@ const CandidateDetailsPage = () => {
   const [candidate, setCandidate] = useState<ICandidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [interviews, setInterviews] = useState<IInterview[]>([]);
-  const [editingInterview, setEditingInterview] = useState<IInterview | null>(null);
+  const [editingInterview, setEditingInterview] = useState<IInterview | null>(
+    null
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [interviewToDelete, setInterviewToDelete] = useState<string | null>(null);
+  const [interviewToDelete, setInterviewToDelete] = useState<string | null>(
+    null
+  );
   const { toast } = useToast();
-
 
   useEffect(() => {
     if (id) {
@@ -84,7 +104,6 @@ const CandidateDetailsPage = () => {
       const response = await axios.get(`/candidate/${candidateId}`);
       const candidateData = response.data.data;
       setCandidate(candidateData);
-
     } catch (error) {
       console.error("Error fetching candidate details:", error);
       setCandidate(null);
@@ -95,14 +114,15 @@ const CandidateDetailsPage = () => {
 
   const fetchInterviews = async (candidateId: string) => {
     try {
+      console.log(candidateId);
+
       const response = await axios.get(`/interview/${candidateId}`);
-      const interviewIds = response.data.data.map((item: { _id: any; }) => item._id);
-      if (interviewIds.length > 0) {
-        localStorage.setItem('interviewId', interviewIds[0]);
-      }
-      console.log("response = ", response);
+
+      console.log("response = ", response.data.data[0]._id);
+
       const interviewData = response.data.data;
       console.log(interviewData);
+
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
@@ -130,7 +150,6 @@ const CandidateDetailsPage = () => {
   const onSubmit: SubmitHandler<InterviewFormValues> = async (data) => {
 
     if (editingInterview) {
-
       try {
         const response = await axios.put(`/interview/${editingInterview._id}`, {
           interview_date: data.interview_date,
@@ -141,19 +160,16 @@ const CandidateDetailsPage = () => {
         toast({
           title: response.data.message,
           className: "toast-success",
-
         });
         setEditingInterview(null);
         reset();
         fetchInterviews(candidate._id);
       } catch (error) {
         console.error("Error updating interview:", error);
-
       }
     } else {
-
       try {
-        const userId = localStorage.getItem('id');
+        const userId = localStorage.getItem("id");
         const response = await axios.post(`/interview`, {
           candidate_id: candidate._id,
           interview_date: data.interview_date,
@@ -165,7 +181,6 @@ const CandidateDetailsPage = () => {
         toast({
           title: response.data.message,
           className: "toast-success",
-
         });
         reset();
         fetchInterviews(candidate._id);
@@ -178,7 +193,10 @@ const CandidateDetailsPage = () => {
 
   const handleEditInterview = (interview: IInterview) => {
     setEditingInterview(interview);
-    setValue("interview_date", moment(interview.interview_date).format("YYYY-MM-DD"));
+    setValue(
+      "interview_date",
+      moment(interview.interview_date).format("YYYY-MM-DD")
+    );
     setValue("interview_type", interview.interview_type);
     setValue("location", interview.location);
     setDialogOpen(true);
@@ -213,18 +231,27 @@ const CandidateDetailsPage = () => {
     setDialogOpen(true);
   };
 
-
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (!candidate) {
-    return <div className="flex justify-center items-center h-screen">Candidate not found.</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Candidate not found.
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto p-6 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-8 text-left text-gray-800">Candidate Details</h1>
+      <h1 className="text-2xl font-bold mb-8 text-left text-gray-800">
+        Candidate Details
+      </h1>
       <div className="shadow-md rounded-md p-3 border border-gray-300">
         <div className="grid grid-cols-2 gap-2">
           <div className="border-b p-4">
@@ -245,7 +272,9 @@ const CandidateDetailsPage = () => {
           </div>
           <div className="border-b p-4">
             <label className="block text-lg font-semibold">Technology:</label>
-            <p className="text-gray-900">{candidate.technology?.technology_name}</p>
+            <p className="text-gray-900">
+              {candidate.technology?.technology_name}
+            </p>
           </div>
           <div className="border-b p-4">
             <label className="block text-lg font-semibold">Job Type:</label>
@@ -254,34 +283,60 @@ const CandidateDetailsPage = () => {
           <div className="p-4">
             <label className="block text-lg font-semibold">Resume:</label>
             {candidate.resume && (
-              <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`} target="_blank" rel="noopener noreferrer">
-                <Button className="bg-green-500 hover:bg-green-600">View Resume</Button>
+              <Link
+                href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="bg-green-500 hover:bg-green-600">
+                  View Resume
+                </Button>
               </Link>
             )}
           </div>
           <div className="p-4">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <label className="block text-md font-semibold">Set Interview Scedule:</label>
+              <label className="block text-md font-semibold">
+                Set Interview Scedule:
+              </label>
               <DialogTrigger asChild>
-                <Button className="bg-blue-500 hover:bg-blue-600 " onClick={handleScheduleInterview}>Schedule Interview</Button>
+                <Button
+                  className="bg-blue-500 hover:bg-blue-600 "
+                  onClick={handleScheduleInterview}
+                >
+                  Schedule Interview
+                </Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogTitle>{editingInterview ? "Edit Interview" : "Schedule Interview"}</DialogTitle>
+                <DialogTitle>
+                  {editingInterview ? "Edit Interview" : "Schedule Interview"}
+                </DialogTitle>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="mb-4">
-                    <label className="block text-lg font-semibold">Interview Date</label>
+                    <label className="block text-lg font-semibold">
+                      Interview Date
+                    </label>
                     <input
-                      type="date"
+                    type="datetime-local" 
                       className="w-full border border-gray-300 rounded-md p-2"
                       {...register("interview_date")}
                       defaultValue={watch("interview_date")}
                     />
-                    {errors.interview_date && <p className="text-red-500">{errors.interview_date.message}</p>}
+                    {/* <DateTimePicker></DateTimePicker> */}
+                    {errors.interview_date && (
+                      <p className="text-red-500">
+                        {errors.interview_date.message}
+                      </p>
+                    )}
                   </div>
                   <div className="mb-4">
-                    <label className="block text-lg font-semibold">Interview Type</label>
+                    <label className="block text-lg font-semibold">
+                      Interview Type
+                    </label>
                     <Select
-                      onValueChange={(value) => setValue("interview_type", value)}
+                      onValueChange={(value) =>
+                        setValue("interview_type", value)
+                      }
                       value={watch("interview_type")}
                     >
                       <SelectTrigger>
@@ -292,21 +347,40 @@ const CandidateDetailsPage = () => {
                         <SelectItem value="Offline">Offline</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.interview_type && <p className="text-red-500">{errors.interview_type.message}</p>}
+                    {errors.interview_type && (
+                      <p className="text-red-500">
+                        {errors.interview_type.message}
+                      </p>
+                    )}
                   </div>
                   <div className="mb-4">
-                    <label className="block text-lg font-semibold">Location</label>
+                    <label className="block text-lg font-semibold">
+                      Location
+                    </label>
                     <input
                       type="text"
                       className="w-full border border-gray-300 rounded-md p-2"
                       {...register("location")}
                       defaultValue={watch("location")}
                     />
-                    {errors.location && <p className="text-red-500">{errors.location.message}</p>}
+                    {errors.location && (
+                      <p className="text-red-500">{errors.location.message}</p>
+                    )}
                   </div>
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-blue-500 hover:bg-blue-600">
-                    {editingInterview ? "Update Interview" : "Schedule Interview"}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-600"
+                  >
+                    {editingInterview
+                      ? "Update Interview"
+                      : "Schedule Interview"}
                   </Button>
                 </form>
               </DialogContent>
@@ -315,7 +389,9 @@ const CandidateDetailsPage = () => {
         </div>
       </div>
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Scheduled Interviews</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          Scheduled Interviews
+        </h2>
         <div className="overflow-x-auto">
           {interviews.length === 0 ? (
             <p>No interviews scheduled.</p>
@@ -333,29 +409,53 @@ const CandidateDetailsPage = () => {
               <TableBody>
                 {interviews.map((interview) => (
                   <TableRow key={interview._id}>
-                    <TableCell>{moment(interview.interview_date).format("Do-MM-YYYY,h:mm:ss a")}</TableCell>
+                    <TableCell>
+                      {moment(interview.interview_date).format(
+                        "Do-MM-YYYY,h:mm:ss a"
+                      )}
+                    </TableCell>
                     <TableCell>{interview.interview_type}</TableCell>
                     <TableCell>{interview.location}</TableCell>
                     <TableCell>
                       <NoteManager/>
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button variant="outline" className="text-blue-600 hover:text-blue-600" size="icon" onClick={() => handleEditInterview(interview)}>
+                      <Button
+                        variant="outline"
+                        className="text-blue-600 hover:text-blue-600"
+                        size="icon"
+                        onClick={() => handleEditInterview(interview)}
+                      >
                         <FaEdit />
                       </Button>
-                      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                      <AlertDialog
+                        open={deleteDialogOpen}
+                        onOpenChange={setDeleteDialogOpen}
+                      >
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" className="text-red-600 hover:text-red-600" size="icon" onClick={() => handleDeleteInterview(interview._id)}>
+                          <Button
+                            variant="outline"
+                            className="text-red-600 hover:text-red-600"
+                            size="icon"
+                            onClick={() => handleDeleteInterview(interview._id)}
+                          >
                             <FaTrash />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Confirm Delete interview scedule</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              Confirm Delete interview scedule
+                            </AlertDialogTitle>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={confirmDeleteInterview}>Delete</AlertDialogAction>
+                            <AlertDialogAction
+                              className="bg-red-600 hover:bg-red-700"
+                              onClick={confirmDeleteInterview}
+                            >
+                              Delete
+                            </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
