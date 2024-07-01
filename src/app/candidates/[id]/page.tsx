@@ -27,6 +27,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import NoteManager from "@/components/NoteManager";
 
 
 interface ICandidate {
@@ -50,7 +52,7 @@ interface IInterview {
   location: string;
 }
 
-const interviewSchema:any = z.object({
+const interviewSchema: any = z.object({
   interview_date: z.string().nonempty("Interview date is required"),
   interview_type: z.string().min(2, "Please choose an option"),
   location: z.string().nonempty("Please enter your location")
@@ -93,21 +95,21 @@ const CandidateDetailsPage = () => {
 
   const fetchInterviews = async (candidateId: string) => {
     try {
-      console.log(candidateId);
-      
-      const response = await axios.get(`/interview/${candidateId}`,);
-
-      console.log( "response = " ,response);
-      
+      const response = await axios.get(`/interview/${candidateId}`);
+      const interviewIds = response.data.data.map((item: { _id: any; }) => item._id);
+      if (interviewIds.length > 0) {
+        localStorage.setItem('interviewId', interviewIds[0]);
+      }
+      console.log("response = ", response);
       const interviewData = response.data.data;
       console.log(interviewData);
-      
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
       setInterviews([]);
     }
   };
+  
 
   const {
     register,
@@ -126,6 +128,7 @@ const CandidateDetailsPage = () => {
   });
 
   const onSubmit: SubmitHandler<InterviewFormValues> = async (data) => {
+
     if (editingInterview) {
 
       try {
@@ -148,9 +151,9 @@ const CandidateDetailsPage = () => {
 
       }
     } else {
-      
+
       try {
-        const userId = localStorage.getItem('id'); 
+        const userId = localStorage.getItem('id');
         const response = await axios.post(`/interview`, {
           candidate_id: candidate._id,
           interview_date: data.interview_date,
@@ -334,14 +337,7 @@ const CandidateDetailsPage = () => {
                     <TableCell>{interview.interview_type}</TableCell>
                     <TableCell>{interview.location}</TableCell>
                     <TableCell>
-                      <Dialog>
-                        <DialogTrigger><FaPlusCircle /></DialogTrigger>
-                        <DialogContent>
-                          <label htmlFor="">Add Notes</label>
-                         <Input placeholder="Add Notes"></Input>
-                         <Button className="w-16 ml-96">Add</Button>
-                        </DialogContent>
-                      </Dialog>
+                      <NoteManager/>
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
                       <Button variant="outline" className="text-blue-600 hover:text-blue-600" size="icon" onClick={() => handleEditInterview(interview)}>

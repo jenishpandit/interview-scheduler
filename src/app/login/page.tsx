@@ -58,6 +58,9 @@ export default function Page() {
       
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('id' ,response.data.data.user._id);
+     
+      
+     
       toast({
         description: "Login successful",
         className: "toast-custom",
