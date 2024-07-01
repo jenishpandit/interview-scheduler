@@ -50,6 +50,16 @@ const Sidebar = () => {
               <FaUser className="mr-2" /> Candidates
             </div>
           </Link>
+          <Link href="/notes">
+            <div
+              className={cn(
+                "mb-4 p-2 flex items-center rounded",
+                pathname === "" && ""
+              )}
+            >
+             
+            </div>
+          </Link>
         </nav>
       </div>
       <div className="p-4 sm:mt-52 mt-52 md:mt-52 lg:mt-52 xl:mt-80 ">

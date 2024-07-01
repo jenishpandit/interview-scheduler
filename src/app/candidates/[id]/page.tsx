@@ -10,9 +10,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "@/components/ui/select";
 import moment from 'moment';
-import { FaEdit, FaTrash , FaPlusCircle  } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlusCircle } from "react-icons/fa";
 import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
+import { Activity } from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 
 
 interface ICandidate {
@@ -47,9 +50,9 @@ interface IInterview {
   location: string;
 }
 
-const interviewSchema = z.object({
+const interviewSchema:any = z.object({
   interview_date: z.string().nonempty("Interview date is required"),
-  interview_type: z.string().min(1, "Please choose an option"),
+  interview_type: z.string().min(2, "Please choose an option"),
   location: z.string().nonempty("Please enter your location")
 });
 
@@ -312,7 +315,7 @@ const CandidateDetailsPage = () => {
                   <TableHead>Date</TableHead>
                   <TableHead>Interview Type</TableHead>
                   <TableHead>Location</TableHead>
-                  {/* <TableHead>Notes</TableHead> */}
+                  <TableHead>Notes</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -322,9 +325,16 @@ const CandidateDetailsPage = () => {
                     <TableCell>{moment(interview.interview_date).format("Do-MM-YYYY,h:mm:ss a")}</TableCell>
                     <TableCell>{interview.interview_type}</TableCell>
                     <TableCell>{interview.location}</TableCell>
-                    {/* <TableCell>
-                    <FaPlusCircle />
-                    </TableCell> */}
+                    <TableCell>
+                      <Dialog>
+                        <DialogTrigger><FaPlusCircle /></DialogTrigger>
+                        <DialogContent>
+                          <label htmlFor="">Add Notes</label>
+                         <Input placeholder="Add Notes"></Input>
+                         <Button className="w-16 ml-96">Add</Button>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
                     <TableCell className="space-x-2 text-right">
                       <Button variant="outline" className="text-blue-600 hover:text-blue-600" size="icon" onClick={() => handleEditInterview(interview)}>
                         <FaEdit />
@@ -341,7 +351,7 @@ const CandidateDetailsPage = () => {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction className="bg-red-600 hover:bg-" onClick={confirmDeleteInterview}>Delete</AlertDialogAction>
+                            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={confirmDeleteInterview}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
