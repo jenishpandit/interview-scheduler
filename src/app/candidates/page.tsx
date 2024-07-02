@@ -88,7 +88,7 @@ const Page: React.FC = () => {
         } catch (error) {
             console.error('Error fetching technologies:', error);
             toast({
-                title: "Error fetching Candidates",
+                title: error?.response?.data?.message,
                 className:"toast-warning",
                 
             });
@@ -106,7 +106,7 @@ const Page: React.FC = () => {
         } catch (error) {
             console.error('Error fetching candidates:', error);
             toast({
-                title: "Error fetching Candidates",
+                title: error?.response?.data?.message,
                 className:"toast-warning",
                 
             });
@@ -152,6 +152,7 @@ const Page: React.FC = () => {
                     className:"toast-success",
                 });
             }
+            
 
             fetchCandidates();
             reset();
@@ -160,7 +161,7 @@ const Page: React.FC = () => {
         } catch (error) {
             console.error('Error adding/updating candidate:', error);
             toast({
-                title: "Error adding/updating candidate",
+                title: error?.response?.data?.message,
                 className:"toast-warning",
             });
         }
@@ -169,23 +170,23 @@ const Page: React.FC = () => {
     const deleteCandidate = async () => {
         if (candidateToDelete) {
             try {
-            const response = await axios.delete(`/candidate/${candidateToDelete}`);
+                const response = await axios.delete(`/candidate/${candidateToDelete}`);
                 toast({
-                    title: response.data,
-                    className:"toast-warning",
-
+                    title: response.data.message || "Candidate deleted successfully",
+                    className: "toast-success",
                 });
                 fetchCandidates();
                 setCandidateToDelete(null);
             } catch (error) {
                 console.error('Error deleting candidate:', error);
                 toast({
-                    title: "Error deleting candidate",
-                    className:"toast-warning",
+                    title: error?.response?.data?.message,
+                    className: "toast-warning",
                 });
             }
         }
     };
+    
 
     const editCandidate = (id: string) => {
         const candidate = candidates.find((c) => c._id === id);
@@ -218,7 +219,7 @@ const Page: React.FC = () => {
 
     return (
         <>
-            <div className="flex border-b border-gray-300">
+            <div className="flex ">
                 <div className="w-1/2 p-4 flex items-start">
                     <h1 className="text-2xl font-bold">Candidates</h1>
                 </div>
@@ -381,11 +382,11 @@ const Page: React.FC = () => {
 
                 </div>
             </div>
+            <div className='overflow-x-auto rounded-xl m-4 border-4 mr-2'>
+            <Table className=''>
 
-            <Table>
-
-                <TableHeader className='bg-gray-200'>
-                    <TableRow>
+                <TableHeader className='bg-gray-200 hover:bg-gray-200'>
+                    <TableRow className='bg-gray-200 hover:bg-gray-200'>
                         <TableHead>First Name</TableHead>
                         <TableHead>Last Name</TableHead>
                         <TableHead>Email</TableHead>
@@ -399,7 +400,7 @@ const Page: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                     {candidates.map((candidate) => (
-                        <TableRow key={candidate._id}>
+                        <TableRow key={candidate?._id}>
                             <TableCell>{candidate.first_name}</TableCell>
                             <TableCell>{candidate.last_name}</TableCell>
                             <TableCell>{candidate.email}</TableCell>
@@ -430,7 +431,7 @@ const Page: React.FC = () => {
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button variant="outline" className="text-red-600 hover:text-red-600" size="icon">
-                                            <FaTrash  onClick={() => setCandidateToDelete(candidate._id)} />
+                                            <FaTrash  onClick={() => setCandidateToDelete(candidate?._id)} />
                                             </Button>
                                            
                                         </AlertDialogTrigger>
@@ -455,6 +456,7 @@ const Page: React.FC = () => {
                     ))}
                 </TableBody>
             </Table>
+            </div>
         </>
     );
 };

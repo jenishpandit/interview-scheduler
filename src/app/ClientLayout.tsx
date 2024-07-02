@@ -13,7 +13,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex h-screen">
       {!noSidebarRoutes.includes(pathname) && (
-        <div className="w-full md:w-1/3 lg:w-64 bg-gray-800 text-white p-5 overflow-x-hidden">
+        <div className="w-full md:w-1/3 lg:w-64  text-white p-5 overflow-x-hidden">
           <Sidebar />
         </div>
       )}

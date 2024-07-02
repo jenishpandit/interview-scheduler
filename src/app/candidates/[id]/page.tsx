@@ -130,6 +130,10 @@ const CandidateDetailsPage = () => {
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
+      toast({
+        title: error?.response?.data?.message,
+        className: "toast-success",
+      });
       setInterviews([]);
     }
   };
@@ -170,6 +174,10 @@ const CandidateDetailsPage = () => {
         fetchInterviews(candidate._id);
       } catch (error) {
         console.error("Error updating interview:", error);
+        toast({
+          title: error?.response?.data?.message,
+          className: "toast-warning",
+        });
       }
     } else {
       try {
@@ -190,6 +198,10 @@ const CandidateDetailsPage = () => {
         fetchInterviews(candidate._id);
       } catch (error) {
         console.error("Error creating interview:", error);
+        toast({
+          title: error?.response?.data?.message,
+          className: "toast-warning",
+        });
       }
     }
     setDialogOpen(false);
@@ -222,6 +234,10 @@ const CandidateDetailsPage = () => {
         fetchInterviews(candidate?._id);
       } catch (error) {
         console.error("Error deleting interview:", error);
+        toast({
+          title: error?.response?.data?.message,
+          className: "toast-warning",
+        });
       } finally {
         setDeleteDialogOpen(false);
         setInterviewToDelete(null);
@@ -292,8 +308,8 @@ const CandidateDetailsPage = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button className="bg-green-500 hover:bg-green-600">
-                  View Resume
+                <Button className="primary">
+                  View 
                 </Button>
               </Link>
             )}
@@ -305,7 +321,7 @@ const CandidateDetailsPage = () => {
               </label>
               <DialogTrigger asChild>
                 <Button
-                  className="bg-blue-500 hover:bg-blue-600 "
+                  className="primary"
                   onClick={handleScheduleInterview}
                 >
                   Schedule Interview
@@ -398,7 +414,7 @@ const CandidateDetailsPage = () => {
         <h2 className="text-xl font-semibold mb-4 text-gray-800">
           Scheduled Interviews
         </h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl  border-4 ml-3">
           {interviews.length === 0 ? (
             <p>No interviews scheduled.</p>
           ) : (

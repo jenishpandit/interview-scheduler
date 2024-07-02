@@ -14,10 +14,10 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={cn("fixed top-0 left-0 h-full w-64 bg-gray-800 text-white")}>
+    <div className={cn("fixed top-0 left-0 h-full w-64 primary text-white")}>
       <div className="flex flex-col p-4">
         <h1 className="text-2xl font-bold mb-2 text-center font-serif">IS</h1>
-        <span className="text-sm mb-4 text-center font-bold">Interview Scheduler</span>
+        <span className="text-xl mb-4 text-center font-bold">Interview Scheduler</span>
         <hr className="h-px bg-gray-500 border-0 dark:bg-gray-700"></hr>
         <nav className="flex flex-col mt-6">
           <Link href="/dashboard">
@@ -62,7 +62,7 @@ const Sidebar = () => {
           </Link>
         </nav>
       </div>
-      <div className="p-4 sm:mt-52 mt-52 md:mt-52 lg:mt-52 xl:mt-80 ">
+      <div className="p-4 sm:mt-52 mt-52 md:mt-52 lg:mt-52 xl:mt-72 ">
         <Button
           className="bg-slate-500 hover:bg-slate-600 text-white p-2 rounded w-full"
           onClick={handleLogout}

@@ -62,8 +62,8 @@ export default function Page() {
       
      
       toast({
-        description: "Login successful",
-        className: "toast-custom",
+        description: response.data.message,
+        className: "toast-success",
       });
       router.push('/dashboard');
     } catch (error) {

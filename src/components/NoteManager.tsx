@@ -1,8 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import axios from '../../src/app/lib/axios';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'; // Adjust path as per your project structure
-import { FaPlusCircle } from 'react-icons/fa';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableCell, TableHead, TableRow } from '@/components/ui/table';
@@ -12,6 +11,7 @@ import { z } from 'zod';
 import { FaEdit, FaEye, FaFileUpload, FaTrash } from "react-icons/fa";
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
+import { useToast } from "@/components/ui/use-toast";
 
 const noteSchema = z.object({
     note_text: z.string().min(1, 'Note text is required'),
@@ -30,7 +30,7 @@ const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) =
     const { register, handleSubmit, reset, formState: { errors } } = useForm<NoteFormData>({
         resolver: zodResolver(noteSchema),
     });
-
+    const { toast } = useToast();
     useEffect(() => {
         if (interviewId) fetchNotes();
     }, [interviewId]);
@@ -62,6 +62,11 @@ const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) =
                 fetchNotes();
             }
             reset();
+            toast({
+                title: response.data.message,
+                className:"toast-success",
+            });
+         
         } catch (error) {
             console.error('Error adding note:', error);
         }

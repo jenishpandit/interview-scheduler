@@ -69,9 +69,9 @@ const Page: React.FC = () => {
       console.error("Error fetching data:", error);
       setError("Failed to fetch technologies");
       toast({
-        title: "Error",
-        description: "Failed to fetch technologies",
-        status: "error",
+        title:error?.response?.data?.message,
+        className:'toast-warning'
+       
       });
     }
   };
@@ -105,9 +105,8 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({
-        title: "Error",
-        description: "Failed to submit form",
-        status: "error",
+        title: error?.response?.data?.message,
+         className:'toast-warning',
       });
     }
   };
@@ -127,7 +126,8 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error adding technology:", error);
       toast({
-       error
+       title:error?.response?.data?.message,
+       className:'toast-warning'
       });
     }
   };
@@ -152,10 +152,8 @@ const Page: React.FC = () => {
       console.error("Error updating technology:", error);
       setError("Failed to update technology");
       toast({
-        title: "Error",
-        description: "Failed to update technology",
+        title: error?.response?.data?.message,
         className:"toast-warning",
-        status: "error",
       });
     }
   };
@@ -177,10 +175,8 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error deleting technology:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete technology",
+        title: error?.response?.data?.message,
         className:"toast-warning",
-        status: "error",
       });
     }
   };
@@ -201,9 +197,9 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center p-4 border-b border-gray-300">
+      <div className="flex justify-between items-center p-4 ">
         <h1 className="text-2xl font-bold text-gray-700">Technologies</h1>
-        <Button className="bg-slate-800 text-white px-4 py-2 rounded-xl" onClick={handleAddTechnology}>+ Add Technology</Button>
+        <Button className="primary text-white px-4 py-2 rounded-xl" onClick={handleAddTechnology}>+ Add Technology</Button>
       </div>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
@@ -222,7 +218,7 @@ const Page: React.FC = () => {
                   <FormItem>
                     <Label className="block text-sm font-medium text-gray-700">Technology Name</Label>
                     <FormControl>
-                      <Input className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="Add Technology Name" {...field} />
+                      <Input className="mt-1 block w-full px-3 py-2  rounded-md shadow-sm sm:text-sm" placeholder="Add Technology Name" {...field} />
                     </FormControl>
                     <FormMessage className="text-red-500 text-sm mt-1">{errors.technology_name?.message}</FormMessage>
                   </FormItem>
@@ -238,25 +234,25 @@ const Page: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="overflow-x-auto bg-gray-100 p-1 rounded-lg">
-        <Table className="min-w-full divide-y divide-gray-200">
-          <TableHead className="bg-gray-200">
+      <div className="overflow-x-auto rounded-xl m-4 ml-6 border-4">
+        <Table className="min-w-full ">
+          <TableHead className="bg-gray-200 ">
           <TableRow className=''>
-                        <TableCell className=" text-left text-xs font-medium text-gray-500 uppercase">Technology Name</TableCell>
+                        <TableCell className="hover:bg-gray-200">Technology Name</TableCell>
 
                     </TableRow>
-                </TableHead>
-                <TableHead className="bg-gray-200">
+                </TableHead >
+                <TableHead className="bg-gray-200 ">
                     <TableRow className=''>
 
-                        <TableCell className="px-10  text-right text-xs font-medium text-gray-500 uppercase">Action</TableCell>
+                        <TableCell className="hover:bg-gray-200">Action</TableCell>
                     </TableRow>
           </TableHead>
           <TableBody className="bg-white divide-y divide-gray-200">
             {technologies.length > 0 ? (
               technologies.map((technology) => (
                 <TableRow key={technology._id}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{technology.technology_name}</TableCell>
+                  <TableCell className="px-16 py-4 whitespace-nowrap">{technology.technology_name}</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap space-x-2">
                     <Button variant="outline"  size="icon" className="px-3 py-1 rounded-md   text-blue-600" onClick={() => handleEdit(technology)}>
                       <FaEdit  className=" text-blue-600 hover:text-blue-600 text-lg" />
