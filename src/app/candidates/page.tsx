@@ -52,6 +52,7 @@ const schema = z.object({
             return files?.[0]?.size <= 5 * 1024 * 1024;
         }, "File size should be less than 5MB"),
     jobType: z.string().min(2, "Please choose an option"),
+    Gender: z.string().min(3, "Please choose an option"),
     technology_id: z.string().min(1, "Please choose an option"),
 });
 
@@ -62,6 +63,7 @@ const defaultValues = {
     phone: '',
     resume: '',
     jobType: '',
+    Gender:'',
     technology_id: '',
 }
 
@@ -83,8 +85,9 @@ const Page: React.FC = () => {
 
     const fetchTechnologies = async () => {
         try {
-            const response: AxiosResponse<any[]> = await axios.get(`/technology`);
+            const response: AxiosResponse<any> = await axios.get(`/technology`);
             setTechnologies(response.data.data);
+            
         } catch (error) {
             console.error('Error fetching technologies:', error);
             toast({
@@ -126,6 +129,7 @@ const Page: React.FC = () => {
             formData.append('phone_number', data.phone);
             formData.append('technology_id', data.technology_id);
             formData.append('type', data.jobType);
+            formData.append('gender', data.Gender);
 
             if (typeof data.resume !== 'string') {
                 formData.append('resume', data.resume[0]);
@@ -342,6 +346,31 @@ const Page: React.FC = () => {
                                             <p className="text-sm text-red-600">{errors.jobType.message}</p>
                                         )}
                                     </div>
+                                    <div>
+                                        <Label htmlFor="Gender">Interview Type</Label>
+                                        <Controller
+                                            name="Gender"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select Gender" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="male">Male</SelectItem>
+                                                        <SelectItem  value="female">Female</SelectItem>
+                                                        <SelectItem  value="others">Other</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                        {errors.jobType && (
+                                            <p className="text-sm text-red-600">{errors.jobType.message}</p>
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
@@ -367,7 +396,7 @@ const Page: React.FC = () => {
                                             className="mt-1"
                                         />
                                     )}
-                                    {errors.resume && (
+                                    {errors.resume && typeof errors.resume.message === "string" && (
                                         <p className="text-sm text-red-600">{errors.resume.message}</p>
                                     )}
                                 </div>
@@ -385,12 +414,13 @@ const Page: React.FC = () => {
             <div className='overflow-x-auto rounded-xl m-4 border-4 mr-2'>
             <Table className=''>
 
-                <TableHeader className='bg-gray-200 hover:bg-gray-200'>
-                    <TableRow className='bg-gray-200 hover:bg-gray-200'>
+                <TableHeader className='bg-gray-200'>
+                    <TableRow>
                         <TableHead>First Name</TableHead>
                         <TableHead>Last Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
+                        <TableHead>Gender</TableHead>
                         <TableHead>Technology</TableHead>
                         <TableHead>Job Type</TableHead>
                         <TableHead>Resume</TableHead>
@@ -400,11 +430,12 @@ const Page: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                     {candidates.map((candidate) => (
-                        <TableRow key={candidate?._id}>
+                        <TableRow key={candidate._id}>
                             <TableCell>{candidate.first_name}</TableCell>
                             <TableCell>{candidate.last_name}</TableCell>
                             <TableCell>{candidate.email}</TableCell>
                             <TableCell>{candidate.phone_number}</TableCell>
+                            <TableCell>{candidate.gender}</TableCell>
                             <TableCell>{candidate.technology.technology_name}</TableCell>
                             <TableCell>{candidate.type}</TableCell>
                             <TableCell>
