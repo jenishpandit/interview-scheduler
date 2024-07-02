@@ -46,6 +46,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import NoteManager from "@/components/NoteManager";
 
 
 interface ICandidate {
@@ -115,14 +116,14 @@ const CandidateDetailsPage = () => {
   const fetchInterviews = async (candidateId: string) => {
     try {
       console.log(candidateId);
-
+      
       const response = await axios.get(`/interview/${candidateId}`);
-
-      console.log("response = ", response.data.data[0]._id);
-
+      localStorage.setItem('interviewId', response.data.data[0]._id);
+      console.log("response = ", response);
+  
       const interviewData = response.data.data;
       console.log(interviewData);
-
+  
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
@@ -417,7 +418,9 @@ const CandidateDetailsPage = () => {
                     <TableCell>{interview.interview_type}</TableCell>
                     <TableCell>{interview.location}</TableCell>
                     <TableCell>
+
                       <NoteManager/>
+                      
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
                       <Button

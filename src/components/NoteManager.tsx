@@ -87,7 +87,7 @@ const NoteManager: React.FC = () => {
         <div>
             <Sheet>
                 <SheetTrigger>
-                    <FaPlusCircle />
+                    <Button variant="outline" size="icon" > <FaPlusCircle /></Button>
                 </SheetTrigger>
                 <SheetContent className="flex flex-col h-full">
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-grow">
@@ -99,7 +99,7 @@ const NoteManager: React.FC = () => {
                                     {notes.length > 0 ? (
                                         notes.map(note => (
                                             <TableRow className='border-none' key={note._id} >
-                                                <TableCell ><Badge className='text-base rounded-md bg-gray-200 text-black hover:bg-gray-200'>{note.note_text}</Badge></TableCell>
+                                                <TableCell className='text-right'><Badge className='text-base rounded-md bg-gray-200 text-black hover:bg-gray-200'>{note.note_text}</Badge></TableCell>
                                                 {/* <TableCell>
                                                     <Button variant="outline" size="icon" onClick={() => handleUpdateNote(note.id, 'Updated text')}><FaEdit /></Button>
                                                     <Button variant="outline" size="icon" onClick={() => handleDeleteNote(note._id)}><FaTrash /></Button>

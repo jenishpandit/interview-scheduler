@@ -9,7 +9,7 @@ import {
 } from "./ui/table";
 import moment from "moment";
 import axios from "../app/lib/axios";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+
 interface TodayInterviewProps {
     Gettecnology: any[];
     selectedTab: string;
@@ -17,6 +17,7 @@ interface TodayInterviewProps {
     getInterview: any[];
   }
   import Link from 'next/link';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 interface Technology {
   _id: string;
   name: string;
