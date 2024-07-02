@@ -26,7 +26,7 @@ interface NoteManagerProps {
 }
 
 const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) => {
-    const [notes, setNotes] = useState([]);
+    const [notes, setNotes] = useState<any[]>([]);
     const { register, handleSubmit, reset, formState: { errors } } = useForm<NoteFormData>({
         resolver: zodResolver(noteSchema),
     });
@@ -75,19 +75,19 @@ const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) =
                     </SheetHeader>
                     <div className="flex-grow overflow-y-auto" style={{ maxHeight: '500px' }}>
                         <Table>
-                            <tbody>
-                                {notes.length > 0 ? (
-                                    notes.map(note => (
-                                        <TableRow className='border-none' key={note._id} >
-                                            <TableCell className='text-right'><Badge className='text-base rounded-md bg-gray-200 text-black hover:bg-gray-200'>{note.note_text}</Badge></TableCell>
-                                            {/* <TableCell>
-                                                    <Button variant="outline" size="icon" onClick={() => handleUpdateNote(note.id, 'Updated text')}><FaEdit /></Button>
-                                                    <Button variant="outline" size="icon" onClick={() => handleDeleteNote(note._id)}><FaTrash /></Button>
-                                                </TableCell> */}
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
+                                <tbody>
+                                    {notes.length > 0 ? (
+                                        notes.map(note =>( 
+                                            <TableRow className='border-none' key={note._id} >
+                                                <TableCell className='text-right'><Badge className='text-base rounded-md bg-gray-200 text-black hover:bg-gray-200'>{note.note_text}</Badge></TableCell>
+                                                {/* <TableCell>
+                                                        <Button variant="outline" size="icon" onClick={() => handleUpdateNote(note.id, 'Updated text')}><FaEdit /></Button>
+                                                        <Button variant="outline" size="icon" onClick={() => handleDeleteNote(note._id)}><FaTrash /></Button>
+                                                    </TableCell> */}
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
                                         <TableCell colSpan={1}>No notes found.</TableCell>
                                     </TableRow>
                                 )}
