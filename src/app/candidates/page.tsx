@@ -52,7 +52,7 @@ const schema = z.object({
             return files?.[0]?.size <= 5 * 1024 * 1024;
         }, "File size should be less than 5MB"),
     jobType: z.string().min(2, "Please choose an option"),
-    Gender: z.string().min(3, "Please choose an option"),
+    gender: z.string().min(3, "Please choose an option"),
     technology_id: z.string().min(1, "Please choose an option"),
 });
 
@@ -63,7 +63,7 @@ const defaultValues = {
     phone: '',
     resume: '',
     jobType: '',
-    Gender:'',
+    gender:'',
     technology_id: '',
 }
 
@@ -129,7 +129,7 @@ const Page: React.FC = () => {
             formData.append('phone_number', data.phone);
             formData.append('technology_id', data.technology_id);
             formData.append('type', data.jobType);
-            formData.append('gender', data.Gender);
+            formData.append('gender', data.gender);
 
             if (typeof data.resume !== 'string') {
                 formData.append('resume', data.resume[0]);
@@ -201,6 +201,7 @@ const Page: React.FC = () => {
             setValue('phone', candidate.phone_number);
             setValue('technology_id', candidate.technology._id);
             setValue('jobType', candidate.type);
+            setValue('gender', candidate.gender);
             setValue('resume', candidate.resume);
             setResumeFile(candidate.resume);
             setEditCandidateId(id);
@@ -347,9 +348,9 @@ const Page: React.FC = () => {
                                         )}
                                     </div>
                                     <div>
-                                        <Label htmlFor="Gender">Interview Type</Label>
+                                        <Label htmlFor="gender">Interview Type</Label>
                                         <Controller
-                                            name="Gender"
+                                            name="gender"
                                             control={control}
                                             render={({ field }) => (
                                                 <Select
