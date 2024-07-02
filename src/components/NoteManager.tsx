@@ -19,24 +19,26 @@ const noteSchema = z.object({
 
 type NoteFormData = z.infer<typeof noteSchema>;
 
-const NoteManager: React.FC = () => {
-    const [notes, setNotes] = useState<Note[]>([]);
-    const [interviewId, setInterviewId] = useState<string | null>(null);
+interface NoteManagerProps {
+    interviewId: string;
+    openNote: boolean;
+    setOpenNote: (note: boolean) => void;
+}
+
+const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) => {
+    const [notes, setNotes] = useState([]);
     const { register, handleSubmit, reset, formState: { errors } } = useForm<NoteFormData>({
         resolver: zodResolver(noteSchema),
     });
 
     useEffect(() => {
-        fetchNotes();
-        const storedInterviewId = localStorage.getItem('interviewId');
-        if (storedInterviewId) {
-            setInterviewId(storedInterviewId);
-        }
-    }, []);
+        if (interviewId) fetchNotes();
+    }, [interviewId]);
+
 
     const fetchNotes = async () => {
         try {
-            const response = await axios.get<Note[]>('/note');
+            const response = await axios.get(`/note/${interviewId}`);
             setNotes(response.data.data);
         } catch (error) {
             console.error('Error fetching notes:', error);
@@ -55,84 +57,59 @@ const NoteManager: React.FC = () => {
         };
 
         try {
-            const response = await axios.post<Note>('/note', postData);
-            setNotes(prevNotes => [...prevNotes, response.data.data]);
+            const response = await axios.post('/note', postData);
+            if (response.data.code === 200) {
+                fetchNotes();
+            }
             reset();
         } catch (error) {
             console.error('Error adding note:', error);
         }
     };
 
-    const handleUpdateNote = async (id: number, updatedText: string) => {
-        try {
-            await axios.put(`/note/${id}`, { note_text: updatedText });
-            setNotes(prevNotes =>
-                prevNotes.map(note => (note.id === id ? { ...note, note_text: updatedText } : note))
-            );
-        } catch (error) {
-            console.error('Error updating note:', error);
-        }
-    };
-
-    const handleDeleteNote = async (id: number) => {
-        try {
-            await axios.delete(`/note/${id}`);
-            setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-        } catch (error) {
-            console.error('Error deleting note:', error);
-        }
-    };
-
     return (
-        <div>
-            <Sheet>
-                <SheetTrigger>
-                    <Button variant="outline" size="icon" > <FaPlusCircle /></Button>
-                </SheetTrigger>
-                <SheetContent className="flex flex-col h-full">
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-grow">
-                        <SheetHeader>
-                        </SheetHeader>
-                        <div className="flex-grow overflow-y-auto" style={{ maxHeight: '500px' }}>
-                            <Table>
-                                <tbody>
-                                    {notes.length > 0 ? (
-                                        notes.map(note => (
-                                            <TableRow className='border-none' key={note._id} >
-                                                <TableCell className='text-right'><Badge className='text-base rounded-md bg-gray-200 text-black hover:bg-gray-200'>{note.note_text}</Badge></TableCell>
-                                                {/* <TableCell>
+        <Sheet open={openNote} onOpenChange={() => setOpenNote(false)}>
+            <SheetContent className="flex flex-col h-full">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-grow">
+                    <SheetHeader>
+                    </SheetHeader>
+                    <div className="flex-grow overflow-y-auto" style={{ maxHeight: '500px' }}>
+                        <Table>
+                            <tbody>
+                                {notes.length > 0 ? (
+                                    notes.map(note => (
+                                        <TableRow className='border-none' key={note._id} >
+                                            <TableCell className='text-right'><Badge className='text-base rounded-md bg-gray-200 text-black hover:bg-gray-200'>{note.note_text}</Badge></TableCell>
+                                            {/* <TableCell>
                                                     <Button variant="outline" size="icon" onClick={() => handleUpdateNote(note.id, 'Updated text')}><FaEdit /></Button>
                                                     <Button variant="outline" size="icon" onClick={() => handleDeleteNote(note._id)}><FaTrash /></Button>
                                                 </TableCell> */}
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={1}>No notes found.</TableCell>
                                         </TableRow>
-                                    )}
-                                </tbody>
-                            </Table>
-                        </div>
-                        <div className="mt-auto">
-                            <Textarea
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={1}>No notes found.</TableCell>
+                                    </TableRow>
+                                )}
+                            </tbody>
+                        </Table>
+                    </div>
+                    <div className="mt-auto">
+                        <Textarea
 
-                                id="note_text"
-                                className="mt-4 w-full"
-                                placeholder="Add Notes"
-                                {...register('note_text')}
-                            />
-                            {errors.note_text && <p className="text-red-500">{errors.note_text.message}</p>}
-                            <Button className="w-full mt-6" type="submit">
-                                Add
-                            </Button>
-                        </div>
-                    </form>
-                </SheetContent>
-            </Sheet>
-
-
-        </div>
+                            id="note_text"
+                            className="mt-4 w-full"
+                            placeholder="Add Notes"
+                            {...register('note_text')}
+                        />
+                        {errors.note_text && <p className="text-red-500">{errors.note_text.message}</p>}
+                        <Button className="w-full mt-6" type="submit">
+                            Add
+                        </Button>
+                    </div>
+                </form>
+            </SheetContent>
+        </Sheet>
     );
 };
 

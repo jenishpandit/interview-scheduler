@@ -91,6 +91,9 @@ const CandidateDetailsPage = () => {
   const [interviewToDelete, setInterviewToDelete] = useState<string | null>(
     null
   );
+  const [interviewId, setInterviewId] = useState(null);
+  const [openNote, setOpenNote] = useState(false);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -116,21 +119,21 @@ const CandidateDetailsPage = () => {
   const fetchInterviews = async (candidateId: string) => {
     try {
       console.log(candidateId);
-      
+
       const response = await axios.get(`/interview/${candidateId}`);
-      localStorage.setItem('interviewId', response.data.data[0]._id);
+
       console.log("response = ", response);
-  
+
       const interviewData = response.data.data;
       console.log(interviewData);
-  
+
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
       setInterviews([]);
     }
   };
-  
+
 
   const {
     register,
@@ -318,7 +321,7 @@ const CandidateDetailsPage = () => {
                       Interview Date
                     </label>
                     <input
-                    type="datetime-local" 
+                      type="datetime-local"
                       className="w-full border border-gray-300 rounded-md p-2"
                       {...register("interview_date")}
                       defaultValue={watch("interview_date")}
@@ -389,6 +392,8 @@ const CandidateDetailsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Interview */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">
           Scheduled Interviews
@@ -418,9 +423,14 @@ const CandidateDetailsPage = () => {
                     <TableCell>{interview.interview_type}</TableCell>
                     <TableCell>{interview.location}</TableCell>
                     <TableCell>
-
-                      <NoteManager/>
-                      
+                      <Button variant="outline" size="icon"
+                        onClick={
+                          () => {
+                            setOpenNote(true)
+                            setInterviewId(interview._id)
+                          }
+                        }
+                      > <FaPlusCircle /></Button>
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
                       <Button
@@ -470,6 +480,13 @@ const CandidateDetailsPage = () => {
           )}
         </div>
       </div>
+
+      {interviewId && openNote &&
+        <NoteManager
+          interviewId={interviewId}
+          openNote={openNote}
+          setOpenNote={setOpenNote}
+        />}
     </div>
   );
 };
