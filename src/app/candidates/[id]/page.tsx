@@ -186,18 +186,6 @@ const CandidateDetailsPage = () => {
     },
   });
 
-  // let {
-  //   reset,
-  //   watch,
-  //   handleSubmit,
-  //   setValue,
-  //   formState: { errors: reInterviewErrors },
-  // } = useForm<ReInterviewFormValue>({
-  //   resolver: zodResolver(reinterviewSchema),
-  //   defaultValues: {
-  //     interview_date: "",
-  //   },
-  // });
 
   const OnResubmit: SubmitHandler<InterviewFormValues> = async (data) => {
     console.log("data" ,data);
@@ -387,64 +375,69 @@ const CandidateDetailsPage = () => {
 
   return (
     <div className="container mx-auto p-6 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-8 text-left text-gray-800">
-        Candidate Details
+      <h1 className="text-2xl font-bold mb-5 text-left text-gray-800 flex justify-between items-center">
+        <span>Candidate Details</span>
+        {candidate.resume && (
+          <Link
+            href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button className="primary">
+              View Resume
+            </Button>
+          </Link>
+
+        )}
       </h1>
-      <div className="shadow-md rounded-md p-3 border border-gray-300">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="border-b p-4">
-            <label className="block text-lg font-semibold">Full Name:</label>
-            <p className="text-gray-900">
-              {candidate.first_name} {candidate.last_name}
-            </p>
+     
+      <div className="shadow-md rounded-md w-96 border border-gray-300 m-4">
+        <div className="grid gap-2">
+          <div className="bg-gray-200 p-4">
+            <label className="text-xl p-2 font-semibold ml-2" >Basic Info</label>
           </div>
-          <div className="border-b p-4">
-            <label className="block text-lg font-semibold">Gender:</label>
-            <p className="text-gray-900">{candidate.gender}</p>
+          <div className="space-y-5 p-8">
+            <div className="flex items-center space-x-2">
+              <label className="text-lg font-semibold">Full Name:</label>
+              <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label className="text-lg font-semibold">Gender:</label>
+              <label className="text-gray-900">{candidate.gender}</label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label className="text-lg font-semibold">Email:</label>
+              <label className="text-gray-900">{candidate.email}</label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label className="text-lg font-semibold">Phone Number:</label>
+              <label className="text-gray-900">{candidate.phone_number}</label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label className="text-lg font-semibold">Technology:</label>
+              <label className="text-gray-900">{candidate.technology?.technology_name}</label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label className="text-lg font-semibold">Job Type:</label>
+              <label className="text-gray-900">{candidate.type}</label>
+            </div>
           </div>
-          <div className="border-b p-4">
-            <label className="block text-lg font-semibold">Email:</label>
-            <p className="text-gray-900">{candidate.email}</p>
-          </div>
-          <div className="border-b p-4">
-            <label className="block text-lg font-semibold">Phone Number:</label>
-            <p className="text-gray-900">{candidate.phone_number}</p>
-          </div>
-          <div className="border-b p-4">
-            <label className="block text-lg font-semibold">Technology:</label>
-            <p className="text-gray-900">
-              {candidate.technology?.technology_name}
-            </p>
-          </div>
-          <div className="border-b p-4">
-            <label className="block text-lg font-semibold">Job Type:</label>
-            <p className="text-gray-900">{candidate.type}</p>
-          </div>
-          <div className="p-4">
-            <label className="block text-lg font-semibold">Resume:</label>
-            {candidate.resume && (
-              <Link
-                href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button className="primary">View</Button>
-              </Link>
-            )}
-          </div>
-          <div className="p-4">
+          <div className="">
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
-                <label className="block text-md font-semibold">
-                  Set Interview Scedule:
-                </label>
+                
                 <DialogTrigger asChild>
-                  <Button
+                  {/* <Button
                     className="bg-blue-500 hover:bg-blue-600 "
                     onClick={handleScheduleInterview}
                   >
                     Schedule Interview
-                  </Button>
+                  </Button> */}
                 </DialogTrigger>
                 <DialogContent>
                   <DialogTitle>Reschedule Interview</DialogTitle>
@@ -553,16 +546,9 @@ const CandidateDetailsPage = () => {
               </Dialog>
             ) : (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <label className="block text-md font-semibold">
-                  Set Interview Scedule:
-                </label>
+                
                 <DialogTrigger asChild>
-                  <Button
-                    className="bg-blue-500 hover:bg-blue-600 "
-                    onClick={handleScheduleInterview}
-                  >
-                    Schedule Interview
-                  </Button>
+                  
                 </DialogTrigger>
                 <DialogContent>
                   <DialogTitle>
@@ -682,8 +668,11 @@ const CandidateDetailsPage = () => {
 
       {/* Interview */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Scheduled Interviews
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
+          <span>Scheduled Interviews</span>
+          <Button className="primary" onClick={handleScheduleInterview}>
+            Schedule Interview
+          </Button>
         </h2>
         <div className="overflow-x-auto rounded-xl  border-4 ml-3">
           {interviews.length === 0 ? (
