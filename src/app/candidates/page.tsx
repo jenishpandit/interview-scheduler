@@ -337,11 +337,6 @@ const Page: React.FC = () => {
                     )}
                   </div>
                 </div>
-<<<<<<< HEAD
-            </div>
-            <div className='overflow-x-auto rounded-xl m-5 border-4 mr-[5px]'>
-            <Table className=''>
-=======
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="technology_id">Technology</Label>
@@ -536,7 +531,6 @@ const Page: React.FC = () => {
                         onClick={() => editCandidate(candidate._id)}
                       />
                     </Button>
->>>>>>> dbcbe7c3d6f1e5f2a92bfa94d2a8e3a8301c8e36
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
