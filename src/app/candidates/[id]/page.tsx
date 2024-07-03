@@ -66,6 +66,7 @@ interface ICandidate {
 
 interface IInterview {
   _id: string;
+  candidate_id:string
   interview_date: Date;
   interview_type: string;
   round: string;
@@ -80,6 +81,10 @@ const interviewSchema: any = z.object({
   location: z.string().nonempty("Please enter your location"),
 });
 
+// let reinterviewSchema: any = z.object({
+//   interview_date: z.string().nonempty("ReInterview date is required"),
+// });
+// type ReInterviewFormValues = z.infer<typeof reinterviewSchema>;
 type InterviewFormValues = z.infer<typeof interviewSchema>;
 
 const CandidateDetailsPage = () => {
@@ -91,16 +96,35 @@ const CandidateDetailsPage = () => {
     null
   );
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [RedialogOpen, setReDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [interviewToDelete, setInterviewToDelete] = useState<string | null>(
     null
   );
   const [interviewId, setInterviewId] = useState<null | any>(null);
+  const [candidateId, setcandidateId] = useState<null | any>(null);
   const [openNote, setOpenNote] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>();
+  const [selectedItem, setSelectedItem] = useState<IInterview | null>(null);
+  const [newDate, setNewDate] = useState(null);
+  // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [sheduleinterview, setsheduleinterview] = useState<IInterview | null>(
+    null
+  );
 
   const { toast } = useToast();
+
+  const handleReschedule = (interview: IInterview) => {
+    // console.log(interview, "Reschedule clicked");
+    setValue("round", interview.round);
+    setValue("location", interview.location);
+    setValue("interview_type", interview.interview_type);
+    // setValue("interview_date", moment(interview.interview_date).format("YYYY-MM-DDTHH:mm"));
+    setSelectedItem(interview);
+    setsheduleinterview(interview);
+    setReDialogOpen(true);
+  };
 
   useEffect(() => {
     if (id) {
@@ -108,6 +132,7 @@ const CandidateDetailsPage = () => {
       fetchInterviews(id as string);
     }
   }, [id]);
+  console.log(selectedItem, ": dsdsfsfsfv");
 
   const fetchCandidateDetails = async (candidateId: string) => {
     try {
@@ -147,7 +172,7 @@ const CandidateDetailsPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors},
     reset,
     setValue,
     watch,
@@ -161,6 +186,51 @@ const CandidateDetailsPage = () => {
     },
   });
 
+  // let {
+  //   reset,
+  //   watch,
+  //   handleSubmit,
+  //   setValue,
+  //   formState: { errors: reInterviewErrors },
+  // } = useForm<ReInterviewFormValue>({
+  //   resolver: zodResolver(reinterviewSchema),
+  //   defaultValues: {
+  //     interview_date: "",
+  //   },
+  // });
+
+  const OnResubmit: SubmitHandler<InterviewFormValues> = async (data) => {
+    console.log("data" ,data);
+    
+    if (selectedItem) {
+      try {
+        console.log(selectedItem, ": selected item");
+        const userId = localStorage.getItem("id");
+        const response = await axios.post(`/interview`, {
+          candidate_id: candidate._id,
+          interview_date: data.interview_date,
+          interview_type: selectedItem.interview_type,
+          round: selectedItem.round,
+          location: selectedItem.location,
+          created_by: userId,
+        });
+        toast({
+          title: response.data.message,
+          className: "toast-success",
+        });
+        reset();
+        setsheduleinterview(null);
+        fetchInterviews(candidate._id);
+      } catch (error) {
+        console.error("Error updating interview:", error);
+        toast({
+          title: error?.response?.data?.message,
+          className: "toast-warning",
+        });
+      }
+    }
+    setReDialogOpen(false);
+  };
   const onSubmit: SubmitHandler<InterviewFormValues> = async (data) => {
     if (editingInterview) {
       try {
@@ -170,7 +240,7 @@ const CandidateDetailsPage = () => {
           round: data.round,
           location: data.location,
         });
-        console.log("Interview Updated:", response.data.data);
+        // console.log("Interview Updated:", response.data.data);
         toast({
           title: response.data.message,
           className: "toast-success",
@@ -196,7 +266,7 @@ const CandidateDetailsPage = () => {
           location: data.location,
           created_by: userId,
         });
-        console.log("Interview Created:", response.data.data);
+        // console.log("Interview Created:", response.data.data);
         toast({
           title: response.data.message,
           className: "toast-success",
@@ -211,14 +281,18 @@ const CandidateDetailsPage = () => {
         });
       }
     }
+    setReDialogOpen(false);
     setDialogOpen(false);
   };
 
   const handleEditInterview = (interview: IInterview) => {
+    // console.log(interview,"Rdit ");
+
     setEditingInterview(interview);
+    setSelectedItem(null)
     setValue(
       "interview_date",
-      moment(interview.interview_date).format("YYYY-MM-DD")
+      moment(interview.interview_date).format("YYYY-MM-DDTHH:mm")
     );
     setValue("interview_type", interview.interview_type);
     setValue("round", interview.round);
@@ -254,24 +328,36 @@ const CandidateDetailsPage = () => {
   };
 
   const handleScheduleInterview = () => {
+    setSelectedItem(null)
     setEditingInterview(null);
     reset();
+    setReDialogOpen(true);
     setDialogOpen(true);
   };
 
   const statusVariantMap = {
-    create: 'secondary',
-    reschedule: 'popover',
-    complete: 'success',
-    rejected: 'destructive',
+    create: "skyblue",
+    reschedule: "grey",
+    complete: "success",
+    rejected: "destructive",
   };
 
-  const handleStatusChange = async (interviewId: string, status: string) => {
+  const handleStatusChange = async (
+    interviewId: string,
+    status: string,
+    interview: IInterview
+  ) => {
+    if (status === "reschedule") {
+      console.log("Hello world");
+      handleReschedule(interview);
+    }
+
     try {
       const response = await axios.put(`/interview/${interviewId}`, {
         status,
       });
-      console.log("Status Updated:", response.data);
+
+      // console.log("Status Updated:", response.data);
       toast({
         title: "Status updated successfully",
         className: "toast-success",
@@ -282,7 +368,6 @@ const CandidateDetailsPage = () => {
       console.error("Error updating status:", error);
     }
   };
-
 
   if (loading) {
     return (
@@ -343,50 +428,46 @@ const CandidateDetailsPage = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button className="primary">
-                  View 
-                </Button>
+                <Button className="primary">View</Button>
               </Link>
             )}
           </div>
           <div className="p-4">
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <label className="block text-md font-semibold">
-                Set Interview Scedule:
-              </label>
-              <DialogTrigger asChild>
-                <Button
-                  className="bg-blue-500 hover:bg-blue-600 "
-                  onClick={handleScheduleInterview}
-                >
-                  Schedule Interview
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogTitle>
-                  {}
-                  {editingInterview ? "Edit Interview" : "Schedule Interview"}
-                </DialogTitle>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div className="mb-4">
-                    <label className="block text-lg font-semibold">
-                      Interview Date
-                    </label>
-                    <input
-                      type="datetime-local"
-                      className="w-full border border-gray-300 rounded-md p-2"
-                      {...register("interview_date")}
-                      defaultValue={watch("interview_date")}
-                    />
-                    {errors.interview_date &&
+            {selectedItem ? (
+              <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
+                <label className="block text-md font-semibold">
+                  Set Interview Scedule:
+                </label>
+                <DialogTrigger asChild>
+                  <Button
+                    className="bg-blue-500 hover:bg-blue-600 "
+                    onClick={handleScheduleInterview}
+                  >
+                    Schedule Interview
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Reschedule Interview</DialogTitle>
+                  <form onSubmit={handleSubmit(OnResubmit)}>
+                    <div className="mb-4">
+                      <label className="block text-lg font-semibold">
+                        Reschedule Interview Date
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full border border-gray-300 rounded-md p-2"
+                        {...register("interview_date")}
+                        defaultValue={watch("interview_date")}
+                      />
+                      {errors.interview_date &&
                       typeof errors.interview_date.message === "string" && (
                         <p className="text-red-500">
                           {errors.interview_date.message}
                         </p>
                       )}
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-lg font-semibold">
+                    </div>
+                    {/* <div className="mb-4 "  >
+                    <label className="block text-lg font-semibold ">
                       Interview Type
                     </label>
                     <Select
@@ -409,7 +490,7 @@ const CandidateDetailsPage = () => {
                           {errors.interview_type.message}
                         </p>
                       )}
-                  </div>
+                  </div>  
                   <div className="mb-4">
                     <label className="block text-lg font-semibold">
                       Round Type
@@ -453,25 +534,148 @@ const CandidateDetailsPage = () => {
                           {errors.location.message}
                         </p>
                       )}
-                  </div>
+                  </div> */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setReDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="bg-blue-500 hover:bg-blue-600"
+                    >
+                      Reschedule Interview
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <label className="block text-md font-semibold">
+                  Set Interview Scedule:
+                </label>
+                <DialogTrigger asChild>
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDialogOpen(false)}
+                    className="bg-blue-500 hover:bg-blue-600 "
+                    onClick={handleScheduleInterview}
                   >
-                    Cancel
+                    Schedule Interview
                   </Button>
-                  <Button
-                    type="submit"
-                    className="bg-blue-500 hover:bg-blue-600"
-                  >
-                    {editingInterview
-                      ? "Update Interview"
-                      : "Schedule Interview"}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>
+                    {}
+                   {editingInterview ? "Edit Schedule Interview" :"Schedule Interview"}
+                  </DialogTitle>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="mb-4">
+                      <label className="block text-lg font-semibold">
+                         Interview Date
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full border border-gray-300 rounded-md p-2"
+                        {...register("interview_date")}
+                        defaultValue={watch("interview_date")}
+                      />
+                      {errors.interview_date &&
+                        typeof errors.interview_date.message === "string" && (
+                          <p className="text-red-500">
+                            {errors.interview_date.message}
+                          </p>
+                        )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-lg font-semibold ">
+                        Interview Type
+                      </label>
+                      <Select
+                        onValueChange={(value) =>
+                          setValue("interview_type", value)
+                        }
+                        value={watch("interview_type")}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Online">Online</SelectItem>
+                          <SelectItem value="Offline">Offline</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.interview_type &&
+                        typeof errors.interview_type.message === "string" && (
+                          <p className="text-red-500">
+                            {errors.interview_type.message}
+                          </p>
+                        )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-lg font-semibold">
+                        Round Type
+                      </label>
+                      <Select
+                        onValueChange={(value) => setValue("round", value)}
+                        value={watch("round")}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="technical interview">
+                            Technical Interview
+                          </SelectItem>
+                          <SelectItem value="practical interview">
+                            Practical Interview
+                          </SelectItem>
+                          <SelectItem value="HR round">HR Round</SelectItem>
+                          <SelectItem value="reschedule">Reschedule</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.round &&
+                        typeof errors.round.message === "string" && (
+                          <p className="text-red-500">{errors.round.message}</p>
+                        )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-lg font-semibold">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md p-2"
+                        {...register("location")}
+                        defaultValue={watch("location")}
+                      />
+                      {errors.location &&
+                        typeof errors.location.message === "string" && (
+                          <p className="text-red-500">
+                            {errors.location.message}
+                          </p>
+                        )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="bg-blue-500 hover:bg-blue-600"
+                    >
+                      {
+                     editingInterview
+                        ? "Update Interview"
+                        : "Schedule Interview"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
       </div>
@@ -515,13 +719,18 @@ const CandidateDetailsPage = () => {
                         onClick={() => {
                           setOpenNote(true);
                           setInterviewId(interview._id);
+                          setcandidateId(interview.candidate_id)
                         }}
                       >
-                        {" "}
                         <FaPlusCircle />
                       </Button>
                     </TableCell>
-                    <TableCell className=" capitalize"> <Badge variant={statusVariantMap[interview.status]}>{interview.status}</Badge></TableCell>
+                    <TableCell className=" capitalize">
+                      {" "}
+                      <Badge variant={statusVariantMap[interview.status]}>
+                        {interview.status}
+                      </Badge>
+                    </TableCell>
                     {/* <TableCell>
                 
                 </TableCell> */}
@@ -530,7 +739,7 @@ const CandidateDetailsPage = () => {
                       <Button className="bg-transparent hover:bg-transparent px-1">
                         <Select
                           onValueChange={(status) =>
-                            handleStatusChange(interview._id, status)
+                            handleStatusChange(interview._id, status, interview)
                           }
                           value={interview.status}
                           // open={statusDropdownOpen === interview._id}
@@ -539,11 +748,14 @@ const CandidateDetailsPage = () => {
                           }
                         >
                           <SelectTrigger className="w-10 text-black">
-                          {/* <MdOutlineEdit className="text-slate-950" /> */}
+                            {/* <MdOutlineEdit className="text-slate-950" /> */}
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="create">Create</SelectItem>
-                            <SelectItem value="reschedule">
+                            <SelectItem
+                              value="reschedule"
+                              onClick={() => handleReschedule(interview)}
+                            >
                               Rescheduled
                             </SelectItem>
                             <SelectItem value="complete">Complete</SelectItem>
@@ -602,6 +814,7 @@ const CandidateDetailsPage = () => {
       {interviewId && openNote && (
         <NoteManager
           interviewId={interviewId}
+          candidateId={candidateId}
           openNote={openNote}
           setOpenNote={setOpenNote}
         />

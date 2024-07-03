@@ -21,11 +21,12 @@ type NoteFormData = z.infer<typeof noteSchema>;
 
 interface NoteManagerProps {
     interviewId: string;
+    candidateId:string
     openNote: boolean;
     setOpenNote: (note: boolean) => void;
 }
 
-const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) => {
+const NoteManager = ({ interviewId,candidateId, openNote, setOpenNote }: NoteManagerProps) => {
     const [notes, setNotes] = useState<any[]>([]);
     const { register, handleSubmit, reset, formState: { errors } } = useForm<NoteFormData>({
         resolver: zodResolver(noteSchema),
@@ -53,6 +54,7 @@ const NoteManager = ({ interviewId, openNote, setOpenNote }: NoteManagerProps) =
 
         const postData = {
             interview_id: interviewId,
+            candidate: candidateId,
             note_text: data.note_text,
         };
 
