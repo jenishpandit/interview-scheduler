@@ -32,7 +32,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-
+import { Activity } from "lucide-react";
 
 import {
   AlertDialog,
@@ -292,11 +292,7 @@ const CandidateDetailsPage = () => {
     setSelectedItem(null)
     setValue(
       "interview_date",
-<<<<<<< HEAD
-      moment(interview.interview_date).format("MMMM Do YYYY, h:mm:ss a")
-=======
       moment(interview.interview_date).format("YYYY-MM-DDTHH:mm")
->>>>>>> dbcbe7c3d6f1e5f2a92bfa94d2a8e3a8301c8e36
     );
     setValue("interview_type", interview.interview_type);
     setValue("round", interview.round);
@@ -363,17 +359,13 @@ const CandidateDetailsPage = () => {
 
       // console.log("Status Updated:", response.data);
       toast({
-        title: response.data.message,
+        title: "Status updated successfully",
         className: "toast-success",
       });
       fetchInterviews(candidate._id);
       setSelectedStatus(response.data);
     } catch (error) {
       console.error("Error updating status:", error);
-      toast({
-        title: error?.response?.data?.message,
-        className: "toast-warning",
-      });
     }
   };
 
@@ -394,88 +386,22 @@ const CandidateDetailsPage = () => {
   }
 
   return (
-    <div className="container  p-8 bg-gray-50 ml-4">
-      <h1 className="text-2xl font-bold mb-5 text-left text-gray-800 flex justify-between items-center">
-        <span>Candidate Details</span>
-        {candidate.resume && (
-          <Link
-            href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button className="primary">
-              View Resume
-            </Button>
-          </Link>
-
-        )}
+    <div className="container mx-auto p-6 bg-gray-50">
+      <h1 className="text-2xl font-bold mb-8 text-left text-gray-800">
+        Candidate Details
       </h1>
-
-
-      <div className="shadow-md rounded-md w-96 border border-gray-300">
-        <div className="grid gap-2">
-          <div className="bg-gray-200 p-4">
-            <label className="text-xl p-2 font-semibold" >Basic Info</label>
+      <div className="shadow-md rounded-md p-3 border border-gray-300">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="border-b p-4">
+            <label className="block text-lg font-semibold">Full Name:</label>
+            <p className="text-gray-900">
+              {candidate.first_name} {candidate.last_name}
+            </p>
           </div>
-          <div className="space-y-5 p-8">
-            <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Full Name:</label>
-              <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Gender:</label>
-              <label className="text-gray-900">{candidate.gender}</label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Email:</label>
-              <label className="text-gray-900">{candidate.email}</label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Phone Number:</label>
-              <label className="text-gray-900">{candidate.phone_number}</label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Technology:</label>
-              <label className="text-gray-900">{candidate.technology?.technology_name}</label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Job Type:</label>
-              <label className="text-gray-900">{candidate.type}</label>
-            </div>
+          <div className="border-b p-4">
+            <label className="block text-lg font-semibold">Gender:</label>
+            <p className="text-gray-900">{candidate.gender}</p>
           </div>
-<<<<<<< HEAD
-
-
-          <div className="">
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <label className="block text-md font-semibold">
-              </label>
-              <DialogTrigger asChild>
-
-              </DialogTrigger>
-              <DialogContent>
-                <DialogTitle>
-                  { }
-                  {editingInterview ? "Edit Interview" : "Schedule Interview"}
-                </DialogTitle>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div className="mb-4">
-                    <label className="block text-lg font-semibold">
-                      Interview Date
-                    </label>
-                    <input
-                      type="datetime-local"
-                      className="w-full border border-gray-300 rounded-md p-2"
-                      {...register("interview_date")}
-                      defaultValue={watch("interview_date")}
-                    />
-                    {errors.interview_date &&
-=======
           <div className="border-b p-4">
             <label className="block text-lg font-semibold">Email:</label>
             <p className="text-gray-900">{candidate.email}</p>
@@ -534,7 +460,6 @@ const CandidateDetailsPage = () => {
                         defaultValue={watch("interview_date")}
                       />
                       {errors.interview_date &&
->>>>>>> dbcbe7c3d6f1e5f2a92bfa94d2a8e3a8301c8e36
                       typeof errors.interview_date.message === "string" && (
                         <p className="text-red-500">
                           {errors.interview_date.message}
@@ -638,19 +563,6 @@ const CandidateDetailsPage = () => {
                   >
                     Schedule Interview
                   </Button>
-<<<<<<< HEAD
-                  <Button
-                    type="submit"
-                    className="bg-blue-500 m-2 hover:bg-blue-600"
-                  >
-                    {editingInterview
-                      ? "Update Interview"
-                      : "Schedule Interview"}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-=======
                 </DialogTrigger>
                 <DialogContent>
                   <DialogTitle>
@@ -764,21 +676,16 @@ const CandidateDetailsPage = () => {
                 </DialogContent>
               </Dialog>
             )}
->>>>>>> dbcbe7c3d6f1e5f2a92bfa94d2a8e3a8301c8e36
           </div>
         </div>
       </div>
 
       {/* Interview */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
-          <span>Scheduled Interviews</span>
-          <Button className="primary" onClick={handleScheduleInterview}>
-            Schedule Interview
-          </Button>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          Scheduled Interviews
         </h2>
-
-        <div className="overflow-x-auto rounded-xl  border-4 ">
+        <div className="overflow-x-auto rounded-xl  border-4 ml-3">
           {interviews.length === 0 ? (
             <p>No interviews scheduled.</p>
           ) : (
