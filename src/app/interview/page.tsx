@@ -76,7 +76,7 @@ const Page: React.FC = () => {
         try {
             const formData = {
                 ...data,
-                interviewDate: moment(date).format('YYYY-MM-DD')
+                interviewDate: moment(date).format('YYYY-MM-DD HH:mm')
             };
 
             if (editCandidateId) {

@@ -17,7 +17,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <Sidebar />
         </div>
       )}
-      <div className={`w-full ${noSidebarRoutes.includes(pathname) ? '' : 'md:w-2/3 lg:w-[90%]'} p-5 overflow-y-auto`}>
+      <div className={`w-full ${noSidebarRoutes.includes(pathname) ? '' : ' w-auto md:w-2/3 lg:w-[90%]'} p-5 overflow-y-auto`}>
         <div className={inter.className}>
           {children}
         </div>

@@ -412,7 +412,7 @@ const Page: React.FC = () => {
 
                 </div>
             </div>
-            <div className='overflow-x-auto rounded-xl m-4 border-4 mr-2'>
+            <div className='overflow-x-auto rounded-xl m-5 border-4 mr-[5px]'>
             <Table className=''>
 
                 <TableHeader className='bg-gray-200'>

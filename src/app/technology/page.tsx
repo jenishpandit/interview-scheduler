@@ -234,7 +234,7 @@ const Page: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="overflow-x-auto rounded-xl m-4 ml-6 border-4">
+      <div className=" rounded-xl ml-4 mt-4 border-4">
         <Table className="min-w-full ">
           <TableHead className="bg-gray-200 ">
           <TableRow className=''>
