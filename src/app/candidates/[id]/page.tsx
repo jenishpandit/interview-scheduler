@@ -481,28 +481,28 @@ const CandidateDetailsPage = () => {
                   >
                     Schedule Interview
                   </Button> */}
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogTitle>Reschedule Interview</DialogTitle>
-                  <form onSubmit={handleSubmit(OnResubmit)}>
-                    <div className="mb-4">
-                      <label className="block text-lg font-semibold">
-                        Reschedule Interview Date
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        {...register("interview_date")}
-                        defaultValue={watch("interview_date")}
-                      />
-                      {errors.interview_date &&
-                      typeof errors.interview_date.message === "string" && (
-                        <p className="text-red-500">
-                          {errors.interview_date.message}
-                        </p>
-                      )}
-                    </div>
-                    {/* <div className="mb-4 "  >
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Reschedule Interview</DialogTitle>
+              <form onSubmit={handleSubmit(OnResubmit)}>
+                <div className="mb-4">
+                  <label className="block text-lg font-semibold">
+                    Reschedule Interview Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className="w-full border border-gray-300 rounded-md p-2"
+                    {...register("interview_date")}
+                    defaultValue={watch("interview_date")}
+                  />
+                  {errors.interview_date &&
+                    typeof errors.interview_date.message === "string" && (
+                      <p className="text-red-500">
+                        {errors.interview_date.message}
+                      </p>
+                    )}
+                </div>
+                {/* <div className="mb-4 "  >
                     <label className="block text-lg font-semibold ">
                       Interview Type
                     </label>
@@ -710,7 +710,7 @@ const CandidateDetailsPage = () => {
       </div >
 
   {/* Interview */ }
-  <div div className = "mt-8" >
+  < div className = "mt-8" >
       <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
           <span className="ml-4">Scheduled Interviews</span>
           <Button className="primary" onClick={handleScheduleInterview}>
@@ -841,7 +841,7 @@ const CandidateDetailsPage = () => {
             </Table>
           )}
         </div>
-      </div >
+      </ >
 
   { interviewId && openNote && (
     <NoteManager
