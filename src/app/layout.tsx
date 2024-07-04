@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ClientLayout from "./ClientLayout"; 
 import { Toaster } from "@/components/ui/toaster";
+import { useRouter } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Create Next App",

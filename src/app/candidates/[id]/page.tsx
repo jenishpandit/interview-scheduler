@@ -481,28 +481,28 @@ const CandidateDetailsPage = () => {
                   >
                     Schedule Interview
                   </Button> */}
-            </DialogTrigger>
-            <DialogContent>
-              <DialogTitle>Reschedule Interview</DialogTitle>
-              <form onSubmit={handleSubmit(OnResubmit)}>
-                <div className="mb-4">
-                  <label className="block text-lg font-semibold">
-                    Reschedule Interview Date
-                  </label>
-                  <input
-                    type="datetime-local"
-                    className="w-full border border-gray-300 rounded-md p-2"
-                    {...register("interview_date")}
-                    defaultValue={watch("interview_date")}
-                  />
-                  {errors.interview_date &&
-                    typeof errors.interview_date.message === "string" && (
-                      <p className="text-red-500">
-                        {errors.interview_date.message}
-                      </p>
-                    )}
-                </div>
-                {/* <div className="mb-4 "  >
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Reschedule Interview</DialogTitle>
+                  <form onSubmit={handleSubmit(OnResubmit)}>
+                    <div className="mb-4">
+                      <label className="block text-lg font-semibold">
+                        Reschedule Interview Date
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full border border-gray-300 rounded-md p-2"
+                        {...register("interview_date")}
+                        defaultValue={watch("interview_date")}
+                      />
+                      {errors.interview_date &&
+                      typeof errors.interview_date.message === "string" && (
+                        <p className="text-red-500">
+                          {errors.interview_date.message}
+                        </p>
+                      )}
+                    </div>
+                    {/* <div className="mb-4 "  >
                     <label className="block text-lg font-semibold ">
                       Interview Type
                     </label>
