@@ -66,7 +66,7 @@ interface ICandidate {
 
 interface IInterview {
   _id: string;
-  candidate_id:string
+  candidate_id: string
   interview_date: Date;
   interview_type: string;
   round: string;
@@ -172,7 +172,7 @@ const CandidateDetailsPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors},
+    formState: { errors },
     reset,
     setValue,
     watch,
@@ -188,8 +188,8 @@ const CandidateDetailsPage = () => {
 
 
   const OnResubmit: SubmitHandler<InterviewFormValues> = async (data) => {
-    console.log("data" ,data);
-    
+    console.log("data", data);
+
     if (selectedItem) {
       try {
         console.log(selectedItem, ": selected item");
@@ -376,7 +376,7 @@ const CandidateDetailsPage = () => {
   return (
     <div className="container mx-auto p-6 bg-gray-50">
       <h1 className="text-2xl font-bold mb-5 text-left text-gray-800 flex justify-between items-center">
-        <span>Candidate Details</span>
+        <span className="ml-4">Candidate Details</span>
         {candidate.resume && (
           <Link
             href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
@@ -390,11 +390,12 @@ const CandidateDetailsPage = () => {
 
         )}
       </h1>
-     
+
       <div className="shadow-md rounded-md w-96 border border-gray-300 m-4">
         <div className="grid gap-2">
+          {/* Basic Info */}
           <div className="bg-gray-200 p-4">
-            <label className="text-xl p-2 font-semibold ml-2" >Basic Info</label>
+            <label className="text-xl p-2 font-semibold ml-2">Basic Info</label>
           </div>
           <div className="space-y-5 p-8">
             <div className="flex items-center space-x-2">
@@ -427,39 +428,81 @@ const CandidateDetailsPage = () => {
               <label className="text-gray-900">{candidate.type}</label>
             </div>
           </div>
-          <div className="">
-            {selectedItem ? (
-              <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
-                
-                <DialogTrigger asChild>
-                  {/* <Button
+
+          {/* Technical Skills */}
+          <div className="bg-gray-200 p-4 mt-4 border border-gray-300">
+            <label className="text-xl p-2 font-semibold ml-2">Technical Skills</label>
+          </div>
+          <div className="space-y-5 p-8 border border-gray-300">
+            {candidate.skills && candidate.skills.length > 0 ? (
+              candidate.skills.map((skill, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <label className="text-lg font-semibold">{skill.name}:</label>
+                  <label className="text-gray-900">{skill.level}</label>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center space-x-2">
+                <label className="text-lg text-gray-900">No skills added</label>
+              </div>
+            )}
+          </div>
+
+          {/* Job Role */}
+          <div className="bg-gray-200 p-4 mt-4 border border-gray-300">
+            <label className="text-xl p-2 font-semibold ml-2">Job Role</label>
+          </div>
+          <div className="space-y-5 p-8 border border-gray-300">
+            {candidate.jobRoles && candidate.jobRoles.length > 0 ? (
+              candidate.jobRoles.map((role, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <label className="text-lg font-semibold">{role.title}:</label>
+                  <label className="text-gray-900">{role.description}</label>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center space-x-2">
+                <label className="text-lg text-gray-900">No job roles added</label>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      <div className="">
+        {selectedItem ? (
+          <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
+
+            <DialogTrigger asChild>
+              {/* <Button
                     className="bg-blue-500 hover:bg-blue-600 "
                     onClick={handleScheduleInterview}
                   >
                     Schedule Interview
                   </Button> */}
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogTitle>Reschedule Interview</DialogTitle>
-                  <form onSubmit={handleSubmit(OnResubmit)}>
-                    <div className="mb-4">
-                      <label className="block text-lg font-semibold">
-                        Reschedule Interview Date
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        {...register("interview_date")}
-                        defaultValue={watch("interview_date")}
-                      />
-                      {errors.interview_date &&
-                      typeof errors.interview_date.message === "string" && (
-                        <p className="text-red-500">
-                          {errors.interview_date.message}
-                        </p>
-                      )}
-                    </div>
-                    {/* <div className="mb-4 "  >
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Reschedule Interview</DialogTitle>
+              <form onSubmit={handleSubmit(OnResubmit)}>
+                <div className="mb-4">
+                  <label className="block text-lg font-semibold">
+                    Reschedule Interview Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className="w-full border border-gray-300 rounded-md p-2"
+                    {...register("interview_date")}
+                    defaultValue={watch("interview_date")}
+                  />
+                  {errors.interview_date &&
+                    typeof errors.interview_date.message === "string" && (
+                      <p className="text-red-500">
+                        {errors.interview_date.message}
+                      </p>
+                    )}
+                </div>
+                {/* <div className="mb-4 "  >
                     <label className="block text-lg font-semibold ">
                       Interview Type
                     </label>
@@ -528,148 +571,148 @@ const CandidateDetailsPage = () => {
                         </p>
                       )}
                   </div> */}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setReDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="bg-blue-500 hover:bg-blue-600"
-                    >
-                      Reschedule Interview
-                    </Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            ) : (
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                
-                <DialogTrigger asChild>
-                  
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogTitle>
-                    {}
-                   {editingInterview ? "Edit Schedule Interview" :"Schedule Interview"}
-                  </DialogTitle>
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="mb-4">
-                      <label className="block text-lg font-semibold">
-                         Interview Date
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        {...register("interview_date")}
-                        defaultValue={watch("interview_date")}
-                      />
-                      {errors.interview_date &&
-                        typeof errors.interview_date.message === "string" && (
-                          <p className="text-red-500">
-                            {errors.interview_date.message}
-                          </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-lg font-semibold ">
-                        Interview Type
-                      </label>
-                      <Select
-                        onValueChange={(value) =>
-                          setValue("interview_type", value)
-                        }
-                        value={watch("interview_type")}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Online">Online</SelectItem>
-                          <SelectItem value="Offline">Offline</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.interview_type &&
-                        typeof errors.interview_type.message === "string" && (
-                          <p className="text-red-500">
-                            {errors.interview_type.message}
-                          </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-lg font-semibold">
-                        Round Type
-                      </label>
-                      <Select
-                        onValueChange={(value) => setValue("round", value)}
-                        value={watch("round")}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="technical interview">
-                            Technical Interview
-                          </SelectItem>
-                          <SelectItem value="practical interview">
-                            Practical Interview
-                          </SelectItem>
-                          <SelectItem value="HR round">HR Round</SelectItem>
-                          <SelectItem value="reschedule">Reschedule</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.round &&
-                        typeof errors.round.message === "string" && (
-                          <p className="text-red-500">{errors.round.message}</p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-lg font-semibold">
-                        Location
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded-md p-2"
-                        {...register("location")}
-                        defaultValue={watch("location")}
-                      />
-                      {errors.location &&
-                        typeof errors.location.message === "string" && (
-                          <p className="text-red-500">
-                            {errors.location.message}
-                          </p>
-                        )}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="bg-blue-500 hover:bg-blue-600"
-                    >
-                      {
-                     editingInterview
-                        ? "Update Interview"
-                        : "Schedule Interview"}
-                    </Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-        </div>
-      </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setReDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  Reschedule Interview
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 
-      {/* Interview */}
-      <div className="mt-8">
+            <DialogTrigger asChild>
+
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>
+                { }
+                {editingInterview ? "Edit Schedule Interview" : "Schedule Interview"}
+              </DialogTitle>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="mb-4">
+                  <label className="block text-lg font-semibold">
+                    Interview Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className="w-full border border-gray-300 rounded-md p-2"
+                    {...register("interview_date")}
+                    defaultValue={watch("interview_date")}
+                  />
+                  {errors.interview_date &&
+                    typeof errors.interview_date.message === "string" && (
+                      <p className="text-red-500">
+                        {errors.interview_date.message}
+                      </p>
+                    )}
+                </div>
+                <div className="mb-4">
+                  <label className="block text-lg font-semibold ">
+                    Interview Type
+                  </label>
+                  <Select
+                    onValueChange={(value) =>
+                      setValue("interview_type", value)
+                    }
+                    value={watch("interview_type")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Online">Online</SelectItem>
+                      <SelectItem value="Offline">Offline</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.interview_type &&
+                    typeof errors.interview_type.message === "string" && (
+                      <p className="text-red-500">
+                        {errors.interview_type.message}
+                      </p>
+                    )}
+                </div>
+                <div className="mb-4">
+                  <label className="block text-lg font-semibold">
+                    Round Type
+                  </label>
+                  <Select
+                    onValueChange={(value) => setValue("round", value)}
+                    value={watch("round")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="technical interview">
+                        Technical Interview
+                      </SelectItem>
+                      <SelectItem value="practical interview">
+                        Practical Interview
+                      </SelectItem>
+                      <SelectItem value="HR round">HR Round</SelectItem>
+                      <SelectItem value="reschedule">Reschedule</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.round &&
+                    typeof errors.round.message === "string" && (
+                      <p className="text-red-500">{errors.round.message}</p>
+                    )}
+                </div>
+                <div className="mb-4">
+                  <label className="block text-lg font-semibold">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-md p-2"
+                    {...register("location")}
+                    defaultValue={watch("location")}
+                  />
+                  {errors.location &&
+                    typeof errors.location.message === "string" && (
+                      <p className="text-red-500">
+                        {errors.location.message}
+                      </p>
+                    )}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  {
+                    editingInterview
+                      ? "Update Interview"
+                      : "Schedule Interview"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    </div>
+      </div >
+
+  {/* Interview */ }
+  <div div className = "mt-8" >
       <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
-          <span>Scheduled Interviews</span>
+          <span className="ml-4">Scheduled Interviews</span>
           <Button className="primary" onClick={handleScheduleInterview}>
             Schedule Interview
           </Button>
@@ -798,17 +841,17 @@ const CandidateDetailsPage = () => {
             </Table>
           )}
         </div>
-      </div>
+      </div >
 
-      {interviewId && openNote && (
-        <NoteManager
-          interviewId={interviewId}
-          candidateId={candidateId}
-          openNote={openNote}
-          setOpenNote={setOpenNote}
-        />
-      )}
-    </div>
+  { interviewId && openNote && (
+    <NoteManager
+      interviewId={interviewId}
+      candidateId={candidateId}
+      openNote={openNote}
+      setOpenNote={setOpenNote}
+    />
+  )}
+    </div >
   );
 };
 
