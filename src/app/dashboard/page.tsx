@@ -30,11 +30,11 @@ const page = () => {
   const [selectedTab, setSelectedTab] = useState("today");
 
   // useEffect(() => {
-    const token = localStorage.getItem('token'); 
-    if (!token) {
+    // const token = localStorage.getItem('token'); 
+    // if (!token) {
   
-      router.push('/login'); 
-    }
+    //   router.push('/login'); 
+    // }
   // }, [router]);
   const fetchDashboard = async () => {
     try {
