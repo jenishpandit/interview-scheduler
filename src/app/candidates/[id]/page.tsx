@@ -466,6 +466,7 @@ const CandidateDetailsPage = () => {
                         </p>
                       )}
                     </div>
+                    {/* ================= Resedule no code che ======================= */}
                     {/* <div className="mb-4 "  >
                     <label className="block text-lg font-semibold ">
                       Interview Type

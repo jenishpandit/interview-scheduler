@@ -5,6 +5,7 @@ import axios from "../lib/axios";
 import DashbordCard from "@/components/dashbordCard";
 import TodayInterview from "@/components/interview";
 import moment from "moment";
+import { useRouter } from "next/navigation";
 
 type DashboardData = {
   candidateTotal: number;
@@ -20,13 +21,21 @@ interface IInterview {
 interface Technology {
   _id: string;
   name: string;
-}
+} 
 const page = () => {
+  const router = useRouter();
   const [dashboard, SetDashboard] = useState<DashboardData | null>(null);
   const [getinterview, setInterview] = useState<IInterview[]>([]);
   const [Gettecnology, setTechnologies] = useState<Technology[]>([]);
   const [selectedTab, setSelectedTab] = useState("today");
 
+  // useEffect(() => {
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+  
+      router.push('/login'); 
+    }
+  // }, [router]);
   const fetchDashboard = async () => {
     try {
       const res = await axios.get<{ data: DashboardData }>("/dashboard/total");
