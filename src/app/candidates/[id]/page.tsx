@@ -391,14 +391,15 @@ const CandidateDetailsPage = () => {
         )}
       </h1>
      
-      <div className="shadow-md rounded-md w-96 border border-gray-300 m-4">
-        <div className="grid gap-2">
-          <div className="bg-gray-200 p-4">
-            <label className="text-xl p-2 font-semibold ml-2" >Basic Info</label>
+      <div className=" w-[100%]  flex gap-5  m-4">
+        <div className=" w-[50%] gap-2 border-2 rounded-xl">
+          <div className="bg-gray-200 p-4 rounded-t-xl  ">
+            <label className="mx-3 text-lg font-bold" > Basic Info</label>
           </div>
+         
           <div className="space-y-5 p-8">
             <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Full Name:</label>
+              <label className="text-lg font-semibold">Candidate Name:</label>
               <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
             </div>
  
@@ -426,7 +427,7 @@ const CandidateDetailsPage = () => {
               <label className="text-lg font-semibold">Job Type:</label>
               <label className="text-gray-900">{candidate.type}</label>
             </div>
-          </div>
+            </div>
           <div className="">
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
@@ -665,6 +666,25 @@ const CandidateDetailsPage = () => {
             )}
           </div>
         </div>
+        <div className="w-[50%] flex flex-col gap-6">
+              <div className="border-2 rounded-xl w-[100%]">
+                <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
+                  <label  className="p-4 text-lg">Candidate Skills</label>
+                </div>
+                <div className="p-8">
+                  <label className="text-xl font-bold">  </label>
+                </div>
+              </div>
+
+              <div className="border-2 rounded-xl  w-[100%]">
+              <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
+                  <label  className="p-4 text-lg">Notes</label>
+                </div>
+                <div className="p-8">
+                  <label className="text-xl font-bold"> </label>
+                </div>
+              </div>
+          </div>
       </div>
  
       {/* Interview */}
