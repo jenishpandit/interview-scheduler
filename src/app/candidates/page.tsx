@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/select";
 import { FaEdit, FaEye, FaFileUpload, FaTrash } from "react-icons/fa";
 import Image from "next/image";
-
 import Link from "next/link";
 import {
   AlertDialog,
@@ -46,6 +45,7 @@ import {
 import axios from "../lib/axios";
 import { AxiosResponse } from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import MultipleSelector from "@/components/ui/multiple-selector";
 
 const schema = z.object({
   firstName: z.string().min(1, "First Name is required"),
@@ -72,7 +72,8 @@ const schema = z.object({
     }, "File size should be less than 5MB"),
   jobType: z.string().min(2, "Please choose an option"),
   gender: z.string().min(3, "Please choose an option"),
-  technology_id: z.string().min(1, "Please choose an option"),
+  job_role: z.string(),
+  skills: z.array(z.string()),
 });
 
 const defaultValues = {
@@ -83,7 +84,8 @@ const defaultValues = {
   resume: "",
   jobType: "",
   gender: "",
-  technology_id: "",
+  job_role: "",
+  skills: "",
 };
 
 type FormData = z.infer<typeof schema>;
@@ -100,9 +102,13 @@ const Page: React.FC = () => {
     resolver: zodResolver(schema),
     defaultValues,
   });
+  // const [filteredRoles, setFilteredRoles] = React.useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [candidates, setCandidates] = useState<FormData[]>([]);
   const [technologies, setTechnologies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [jobRole, setJobrole] = useState<string[]>([]);
   const [editCandidateId, setEditCandidateId] = useState<string | null>(null);
   const [candidateToDelete, setCandidateToDelete] = useState<string | null>(
     null
@@ -110,6 +116,14 @@ const Page: React.FC = () => {
   const [resumeFile, setResumeFile] = useState<string | File | null>(null);
   const { toast } = useToast();
 
+  const handleChange = (event) => {
+    setSearchTerm(event.target.value);
+    // Filter data based on searchTerm
+    const results = jobRole.filter((item) =>
+      item.toLowerCase().includes(event.target.value.toLowerCase())
+    );
+    setSearchResults(results);
+  };
   const fetchTechnologies = async () => {
     try {
       const response: AxiosResponse<any> = await axios.get(`/technology`);
@@ -140,6 +154,21 @@ const Page: React.FC = () => {
     }
   };
 
+  const fetchRole = async () => {
+    try {
+      const res = await axios.get("/candidate/roles");
+      // console.log(res.data.data);
+      setJobrole(res.data.data);
+      setSearchResults(res.data.data);
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRole();
+  }, []);
+
   useEffect(() => {
     fetchCandidates();
   }, []);
@@ -151,9 +180,14 @@ const Page: React.FC = () => {
       formData.append("last_name", data.lastName);
       formData.append("email", data.email);
       formData.append("phone_number", data.phone);
-      formData.append("technology_id", data.technology_id);
       formData.append("type", data.jobType);
       formData.append("gender", data.gender);
+      // formData.append("skills",data.skills);
+      data.skills.forEach((skill) => {
+        formData.append("skills[]", skill);
+      });
+
+      formData.append("job_role", data.job_role);
 
       if (typeof data.resume !== "string") {
         formData.append("resume", data.resume[0]);
@@ -225,9 +259,10 @@ const Page: React.FC = () => {
       setValue("lastName", candidate.last_name);
       setValue("email", candidate.email);
       setValue("phone", candidate.phone_number);
-      setValue("technology_id", candidate.technology._id);
       setValue("jobType", candidate.type);
       setValue("gender", candidate.gender);
+      setValue("skills", candidate.skills);
+      setValue("job_role", candidate.job_role);
       setValue("resume", candidate.resume);
       setResumeFile(candidate.resume);
       setEditCandidateId(id);
@@ -247,7 +282,11 @@ const Page: React.FC = () => {
     setResumeFile(null);
     setValue("resume", null);
   };
+  // console.log(jobRole);
 
+  useEffect(() => {
+    fetchTechnologies();
+  }, []);
   return (
     <>
       <div className="flex ">
@@ -338,7 +377,7 @@ const Page: React.FC = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+                  {/* <div>
                     <Label htmlFor="technology_id">Technology</Label>
                     <Controller
                       name="technology_id"
@@ -365,6 +404,48 @@ const Page: React.FC = () => {
                       <p className="text-sm text-red-600">
                         {errors.technology_id.message}
                       </p>
+                    )}
+                  </div> */}
+                  <div className="mb-4">
+                    <Label htmlFor="skills">Skills</Label>
+                    <Controller
+                      name="skills"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex">
+                          <MultipleSelector
+                            className=""
+                            placeholder="Skills Select..."
+                            defaultOptions={technologies.map((role) => ({
+                              value: role._id,
+                              label: role.technology_name,
+                            }))}
+                            onChange={(selected) => {
+                              // Update the selected values in the form state
+                              field.onChange(selected.map((s) => s.value));
+                            }}
+                            value={
+                              Array.isArray(field.value)
+                                ? field.value.map((value) => ({
+                                    value: value,
+                                    label:
+                                      technologies.find(
+                                        (tech) => tech._id === value
+                                      )?.technology_name || value,
+                                  }))
+                                : []
+                            }
+                            emptyIndicator={
+                              <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                no results found.
+                              </p>
+                            }
+                          />
+                        </div>
+                      )}
+                    />
+                    {errors.skills && (
+                      <p className="text-red-500">{errors.skills.message}</p>
                     )}
                   </div>
                   <div>
@@ -414,9 +495,71 @@ const Page: React.FC = () => {
                         </Select>
                       )}
                     />
-                    {errors.jobType && (
+                    {errors.gender && (
                       <p className="text-sm text-red-600">
-                        {errors.jobType.message}
+                        {errors.gender.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    {/* <Label htmlFor="job_role">Job Role</Label>
+                    <Controller
+                      name="job_role"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a Job Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {jobRole.map((data,index) => (
+                              <SelectItem key={index} value={data} >
+                                {data}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    /> */}
+                    {/* {errors.job_role && (
+                      <p className="text-sm text-red-600">
+                        {errors.job_role.message}
+                      </p>
+                    )} */}
+                    <Label htmlFor="job_role">Job Role</Label>
+                    <Controller
+                      name="job_role"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a Job Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <Input
+                              type="text"
+                              placeholder="Search job roles"
+                              value={searchTerm}
+                              onChange={handleChange}
+                            />
+                            {searchResults.map((role) => (
+                              <SelectItem key={role} value={role}>
+                                {role}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.job_role && (
+                      <p className="text-sm text-red-600">
+                        {errors.job_role.message}
                       </p>
                     )}
                   </div>
@@ -475,12 +618,9 @@ const Page: React.FC = () => {
         <Table className="">
           <TableHeader className="bg-gray-200">
             <TableRow>
-              <TableHead>First Name</TableHead>
-              <TableHead>Last Name</TableHead>
+              <TableHead>Candidate Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>Technology</TableHead>
+              <TableHead>Job Role</TableHead>
               <TableHead>Job Type</TableHead>
               <TableHead>Resume</TableHead>
               <TableHead>Actions</TableHead>
@@ -490,15 +630,12 @@ const Page: React.FC = () => {
           <TableBody>
             {candidates.map((candidate) => (
               <TableRow key={candidate._id}>
-                <TableCell>{candidate.first_name}</TableCell>
-                <TableCell>{candidate.last_name}</TableCell>
-                <TableCell>{candidate.email}</TableCell>
-                <TableCell>{candidate.phone_number}</TableCell>
-                <TableCell className=" capitalize">
-                  {candidate.gender}
+                <TableCell>
+                  {candidate.first_name} {candidate.last_name}
                 </TableCell>
+                <TableCell>{candidate.email}</TableCell>
                 <TableCell className=" capitalize">
-                  {candidate.technology.technology_name}
+                  {candidate.job_role}
                 </TableCell>
                 <TableCell>{candidate.type}</TableCell>
                 <TableCell>

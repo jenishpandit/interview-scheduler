@@ -21,7 +21,7 @@ const badgeVariants = cva(
         "bg-cyan-200",
         grey:
         "bg-neutral-200"
-      },
+      },   
     },
     defaultVariants: {
       variant: "default",

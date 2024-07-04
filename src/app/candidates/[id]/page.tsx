@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { Activity } from "lucide-react";
- 
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,7 +49,7 @@ import { Input } from "@/components/ui/input";
 import NoteManager from "@/components/NoteManager";
 import { MdOutlineEdit } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
- 
+
 interface ICandidate {
   _id: string;
   first_name: string;
@@ -63,7 +63,7 @@ interface ICandidate {
     technology_name: string;
   };
 }
- 
+
 interface IInterview {
   _id: string;
   candidate_id:string
@@ -73,20 +73,20 @@ interface IInterview {
   location: string;
   status: string;
 }
- 
+
 const interviewSchema: any = z.object({
   interview_date: z.string().nonempty("Interview date is required"),
   interview_type: z.string().min(2, "Please choose an option"),
   round: z.string().min(4, "Please choose an option"),
   location: z.string().nonempty("Please enter your location"),
 });
- 
+
 // let reinterviewSchema: any = z.object({
 //   interview_date: z.string().nonempty("ReInterview date is required"),
 // });
 // type ReInterviewFormValues = z.infer<typeof reinterviewSchema>;
 type InterviewFormValues = z.infer<typeof interviewSchema>;
- 
+
 const CandidateDetailsPage = () => {
   const { id } = useParams();
   const [candidate, setCandidate] = useState<ICandidate | null | any>(null);
@@ -112,9 +112,9 @@ const CandidateDetailsPage = () => {
   const [sheduleinterview, setsheduleinterview] = useState<IInterview | null>(
     null
   );
- 
+
   const { toast } = useToast();
- 
+
   const handleReschedule = (interview: IInterview) => {
     // console.log(interview, "Reschedule clicked");
     setValue("round", interview.round);
@@ -125,7 +125,7 @@ const CandidateDetailsPage = () => {
     setsheduleinterview(interview);
     setReDialogOpen(true);
   };
- 
+
   useEffect(() => {
     if (id) {
       fetchCandidateDetails(id as string);
@@ -133,7 +133,7 @@ const CandidateDetailsPage = () => {
     }
   }, [id]);
   console.log(selectedItem, ": dsdsfsfsfv");
- 
+
   const fetchCandidateDetails = async (candidateId: string) => {
     try {
       const response = await axios.get(`/candidate/${candidateId}`);
@@ -146,18 +146,18 @@ const CandidateDetailsPage = () => {
       setLoading(false);
     }
   };
- 
+
   const fetchInterviews = async (candidateId: string) => {
     try {
       console.log(candidateId);
- 
+
       const response = await axios.get(`/interview/${candidateId}`);
- 
+
       console.log("response = ", response);
- 
+
       const interviewData = response.data.data;
       console.log(interviewData);
- 
+
       setInterviews(interviewData);
     } catch (error) {
       console.error("Error fetching interviews:", error);
@@ -168,7 +168,7 @@ const CandidateDetailsPage = () => {
       setInterviews([]);
     }
   };
- 
+
   const {
     register,
     handleSubmit,
@@ -185,11 +185,11 @@ const CandidateDetailsPage = () => {
       location: "",
     },
   });
- 
- 
+
+
   const OnResubmit: SubmitHandler<InterviewFormValues> = async (data) => {
     console.log("data" ,data);
-   
+    
     if (selectedItem) {
       try {
         console.log(selectedItem, ": selected item");
@@ -272,10 +272,10 @@ const CandidateDetailsPage = () => {
     setReDialogOpen(false);
     setDialogOpen(false);
   };
- 
+
   const handleEditInterview = (interview: IInterview) => {
     // console.log(interview,"Rdit ");
- 
+
     setEditingInterview(interview);
     setSelectedItem(null)
     setValue(
@@ -287,12 +287,12 @@ const CandidateDetailsPage = () => {
     setValue("location", interview.location);
     setDialogOpen(true);
   };
- 
+
   const handleDeleteInterview = (interviewId: string) => {
     setInterviewToDelete(interviewId);
     setDeleteDialogOpen(true);
   };
- 
+
   const confirmDeleteInterview = async () => {
     if (interviewToDelete) {
       try {
@@ -314,7 +314,7 @@ const CandidateDetailsPage = () => {
       }
     }
   };
- 
+
   const handleScheduleInterview = () => {
     setSelectedItem(null)
     setEditingInterview(null);
@@ -322,14 +322,14 @@ const CandidateDetailsPage = () => {
     setReDialogOpen(true);
     setDialogOpen(true);
   };
- 
+
   const statusVariantMap = {
     create: "skyblue",
     reschedule: "grey",
     complete: "success",
     rejected: "destructive",
   };
- 
+
   const handleStatusChange = async (
     interviewId: string,
     status: string,
@@ -339,12 +339,12 @@ const CandidateDetailsPage = () => {
       console.log("Hello world");
       handleReschedule(interview);
     }
- 
+
     try {
       const response = await axios.put(`/interview/${interviewId}`, {
         status,
       });
- 
+
       // console.log("Status Updated:", response.data);
       toast({
         title: "Status updated successfully",
@@ -356,7 +356,7 @@ const CandidateDetailsPage = () => {
       console.error("Error updating status:", error);
     }
   };
- 
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -364,7 +364,7 @@ const CandidateDetailsPage = () => {
       </div>
     );
   }
- 
+
   if (!candidate) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -372,7 +372,7 @@ const CandidateDetailsPage = () => {
       </div>
     );
   }
- 
+
   return (
     <div className="container mx-auto p-6 bg-gray-50">
       <h1 className="text-2xl font-bold mb-5 text-left text-gray-800 flex justify-between items-center">
@@ -387,7 +387,7 @@ const CandidateDetailsPage = () => {
               View Resume
             </Button>
           </Link>
- 
+
         )}
       </h1>
      
@@ -402,27 +402,27 @@ const CandidateDetailsPage = () => {
               <label className="text-lg font-semibold">Candidate Name:</label>
               <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
             </div>
- 
+
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Gender:</label>
               <label className="text-gray-900">{candidate.gender}</label>
             </div>
- 
+
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Email:</label>
               <label className="text-gray-900">{candidate.email}</label>
             </div>
- 
+
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Phone Number:</label>
               <label className="text-gray-900">{candidate.phone_number}</label>
             </div>
- 
+
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Technology:</label>
               <label className="text-gray-900">{candidate.technology?.technology_name}</label>
             </div>
- 
+
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Job Type:</label>
               <label className="text-gray-900">{candidate.type}</label>
@@ -431,7 +431,7 @@ const CandidateDetailsPage = () => {
           <div className="">
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
-               
+                
                 <DialogTrigger asChild>
                   {/* <Button
                     className="bg-blue-500 hover:bg-blue-600 "
@@ -548,9 +548,9 @@ const CandidateDetailsPage = () => {
               </Dialog>
             ) : (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-               
+                
                 <DialogTrigger asChild>
-                 
+                  
                 </DialogTrigger>
                 <DialogContent>
                   <DialogTitle>
@@ -686,7 +686,7 @@ const CandidateDetailsPage = () => {
               </div>
           </div>
       </div>
- 
+
       {/* Interview */}
       <div className="mt-8">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
@@ -742,9 +742,9 @@ const CandidateDetailsPage = () => {
                       </Badge>
                     </TableCell>
                     {/* <TableCell>
-               
+                
                 </TableCell> */}
- 
+
                     <TableCell className="space-x-2 text-right">
                       <Button className="bg-transparent hover:bg-transparent px-1">
                         <Select
@@ -820,7 +820,7 @@ const CandidateDetailsPage = () => {
           )}
         </div>
       </div>
- 
+
       {interviewId && openNote && (
         <NoteManager
           interviewId={interviewId}
@@ -832,5 +832,5 @@ const CandidateDetailsPage = () => {
     </div>
   );
 };
- 
+
 export default CandidateDetailsPage;
