@@ -49,6 +49,7 @@ import { Input } from "@/components/ui/input";
 import NoteManager from "@/components/NoteManager";
 import { MdOutlineEdit } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
+import { AxiosResponse } from "axios";
 
 interface ICandidate {
   _id: string;
@@ -57,6 +58,7 @@ interface ICandidate {
   email: string;
   phone_number: string;
   type: string;
+  skills: string[],
   resume: string;
   technology?: {
     technology_id: string;
@@ -66,7 +68,7 @@ interface ICandidate {
 
 interface IInterview {
   _id: string;
-  candidate_id:string
+  candidate_id: string;
   interview_date: Date;
   interview_type: string;
   round: string;
@@ -108,6 +110,8 @@ const CandidateDetailsPage = () => {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>();
   const [selectedItem, setSelectedItem] = useState<IInterview | null>(null);
   const [newDate, setNewDate] = useState(null);
+  
+  const [technologies, setTechnologies] = useState<any[]>([]);
   // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [sheduleinterview, setsheduleinterview] = useState<IInterview | null>(
     null
@@ -146,6 +150,34 @@ const CandidateDetailsPage = () => {
       setLoading(false);
     }
   };
+  const fetchTechnologies = async () => {
+    try {
+      const response: AxiosResponse<any> = await axios.get(`/technology`);
+      setTechnologies(response.data.data);
+    } catch (error) {
+      console.error("Error fetching technologies:", error);
+      toast({
+        title: error?.response?.data?.message,
+        className: "toast-warning",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchTechnologies();
+  }, []);
+
+  
+  // const skills = candidate.email;
+  // const skillNames = candidate.skills.map((e) => {
+  //   console.log(e);
+    
+  //   // const tech = technologies.find((tech) => tech._id === e);
+  //   // return tech ? tech.technology_name : "Unknown Technology";
+  // });
+
+  // console.log(skills, "cscsfsfsfsf");
+  
 
   const fetchInterviews = async (candidateId: string) => {
     try {
@@ -172,7 +204,7 @@ const CandidateDetailsPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors},
+    formState: { errors },
     reset,
     setValue,
     watch,
@@ -186,10 +218,9 @@ const CandidateDetailsPage = () => {
     },
   });
 
-
   const OnResubmit: SubmitHandler<InterviewFormValues> = async (data) => {
-    console.log("data" ,data);
-    
+    console.log("data", data);
+
     if (selectedItem) {
       try {
         console.log(selectedItem, ": selected item");
@@ -277,7 +308,7 @@ const CandidateDetailsPage = () => {
     // console.log(interview,"Rdit ");
 
     setEditingInterview(interview);
-    setSelectedItem(null)
+    setSelectedItem(null);
     setValue(
       "interview_date",
       moment(interview.interview_date).format("YYYY-MM-DDTHH:mm")
@@ -316,7 +347,7 @@ const CandidateDetailsPage = () => {
   };
 
   const handleScheduleInterview = () => {
-    setSelectedItem(null)
+    setSelectedItem(null);
     setEditingInterview(null);
     reset();
     setReDialogOpen(true);
@@ -383,24 +414,23 @@ const CandidateDetailsPage = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button className="primary">
-              View Resume
-            </Button>
+            <Button className="primary">View Resume</Button>
           </Link>
-
         )}
       </h1>
-     
+
       <div className=" w-[100%]  flex gap-5  m-4">
         <div className=" w-[50%] gap-2 border-2 rounded-xl">
           <div className="bg-gray-200 p-4 rounded-t-xl  ">
-            <label className="mx-3 text-lg font-bold" > Basic Info</label>
+            <label className="mx-3 text-lg font-bold"> Basic Info</label>
           </div>
-         
+
           <div className="space-y-5 p-8">
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Candidate Name:</label>
-              <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
+              <label className="text-gray-900">
+                {candidate.first_name} {candidate.last_name}
+              </label>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -419,19 +449,18 @@ const CandidateDetailsPage = () => {
             </div>
 
             <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Technology:</label>
-              <label className="text-gray-900">{candidate.technology?.technology_name}</label>
+              <label className="text-lg font-semibold">Job Role:</label>
+              <label className="text-gray-900">{candidate.job_role}</label>
             </div>
 
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Job Type:</label>
               <label className="text-gray-900">{candidate.type}</label>
             </div>
-            </div>
+          </div>
           <div className="">
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
-                
                 <DialogTrigger asChild>
                   {/* <Button
                     className="bg-blue-500 hover:bg-blue-600 "
@@ -454,11 +483,11 @@ const CandidateDetailsPage = () => {
                         defaultValue={watch("interview_date")}
                       />
                       {errors.interview_date &&
-                      typeof errors.interview_date.message === "string" && (
-                        <p className="text-red-500">
-                          {errors.interview_date.message}
-                        </p>
-                      )}
+                        typeof errors.interview_date.message === "string" && (
+                          <p className="text-red-500">
+                            {errors.interview_date.message}
+                          </p>
+                        )}
                     </div>
                     {/* ================= Resedule no code che ======================= */}
                     {/* <div className="mb-4 "  >
@@ -548,19 +577,18 @@ const CandidateDetailsPage = () => {
               </Dialog>
             ) : (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                
-                <DialogTrigger asChild>
-                  
-                </DialogTrigger>
+                <DialogTrigger asChild></DialogTrigger>
                 <DialogContent>
                   <DialogTitle>
                     {}
-                   {editingInterview ? "Edit Schedule Interview" :"Schedule Interview"}
+                    {editingInterview
+                      ? "Edit Schedule Interview"
+                      : "Schedule Interview"}
                   </DialogTitle>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-4">
                       <label className="block text-lg font-semibold">
-                         Interview Date
+                        Interview Date
                       </label>
                       <input
                         type="datetime-local"
@@ -655,8 +683,7 @@ const CandidateDetailsPage = () => {
                       type="submit"
                       className="bg-blue-500 hover:bg-blue-600"
                     >
-                      {
-                     editingInterview
+                      {editingInterview
                         ? "Update Interview"
                         : "Schedule Interview"}
                     </Button>
@@ -667,29 +694,29 @@ const CandidateDetailsPage = () => {
           </div>
         </div>
         <div className="w-[50%] flex flex-col gap-6">
-              <div className="border-2 rounded-xl w-[100%]">
-                <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
-                  <label  className="p-4 text-lg">Candidate Skills</label>
-                </div>
-                <div className="p-8">
-                  <label className="text-xl font-bold">  </label>
-                </div>
-              </div>
-
-              <div className="border-2 rounded-xl  w-[100%]">
-              <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
-                  <label  className="p-4 text-lg">Notes</label>
-                </div>
-                <div className="p-8">
-                  <label className="text-xl font-bold"> </label>
-                </div>
-              </div>
+          <div className="border-2 rounded-xl w-[100%]">
+            <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
+              <label className="p-4 text-lg">Candidate Skills</label>
+            </div>
+            <div className="p-8">
+              <label className="text-xl font-bold"> </label>
+            </div>
           </div>
+
+          <div className="border-2 rounded-xl  w-[100%]">
+            <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
+              <label className="p-4 text-lg">Notes</label>
+            </div>
+            <div className="p-8">
+              <label className="text-xl font-bold"> </label>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Interview */}
       <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
           <span>Scheduled Interviews</span>
           <Button className="primary" onClick={handleScheduleInterview}>
             Schedule Interview
@@ -729,7 +756,7 @@ const CandidateDetailsPage = () => {
                         onClick={() => {
                           setOpenNote(true);
                           setInterviewId(interview._id);
-                          setcandidateId(interview.candidate_id)
+                          setcandidateId(interview.candidate_id);
                         }}
                       >
                         <FaPlusCircle />

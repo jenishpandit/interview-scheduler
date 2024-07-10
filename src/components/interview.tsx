@@ -8,7 +8,6 @@ import {
   TableRow,
 } from "./ui/table";
 import moment from "moment";
-import axios from "../app/lib/axios";
 
 interface TodayInterviewProps {
   Gettecnology: any[];
