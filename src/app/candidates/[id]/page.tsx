@@ -49,6 +49,7 @@ import { Input } from "@/components/ui/input";
 import NoteManager from "@/components/NoteManager";
 import { MdOutlineEdit } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
+import { AxiosResponse } from "axios";
 
 interface ICandidate {
   _id: string;
@@ -57,7 +58,7 @@ interface ICandidate {
   email: string;
   phone_number: string;
   type: string;
-  skills: string[],
+  skills: string[];
   resume: string;
   technology?: {
     technology_id: string;
@@ -102,17 +103,16 @@ const CandidateDetailsPage = () => {
   const [interviewToDelete, setInterviewToDelete] = useState<string | null>(
     null
   );
-  const [interviewId, setInterviewId] = useState<null | any>(null);
-  const [candidateId, setcandidateId] = useState<null | any>(null);
   const [technologies, setTechnologies] = useState<any[]>([]);
   const [latestNote, setLatestNote] = useState<any[]>([]);
+  const [interviewId, setInterviewId] = useState<null | any>(null);
+  const [candidateId, setcandidateId] = useState<null | any>(null);
   const [openNote, setOpenNote] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>();
   const [selectedItem, setSelectedItem] = useState<IInterview | null>(null);
   const [newDate, setNewDate] = useState(null);
-  
-  const [technologies, setTechnologies] = useState<any[]>([]);
+
   // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [sheduleinterview, setsheduleinterview] = useState<IInterview | null>(
     null
@@ -137,11 +137,12 @@ const CandidateDetailsPage = () => {
       fetchInterviews(id as string);
     }
   }, [id]);
+
   console.log(selectedItem, ": dsdsfsfsfv");
 
   const getTechnologyNameById = (id: any) => {
-    const technology = technologies.find(tech => tech._id === id);
-    return technology ? technology.technology_name : 'Unknown Technology';
+    const technology = technologies.find((tech) => tech._id === id);
+    return technology ? technology.technology_name : "Unknown Technology";
   };
 
   const fetchTechnologies = async () => {
@@ -167,28 +168,23 @@ const CandidateDetailsPage = () => {
       const noteText = response.data.data.note_text;
       //console.log("Latest Note", noteText);
       setLatestNote(noteText);
-     // console.log(setLatestNote(),"setsdsdsdws");
-      
-    // console.log(noteText,"====latest note"); 
-      
+      // console.log(setLatestNote(),"setsdsdsdws");
 
+      // console.log(noteText,"====latest note");
     } catch (error) {
       console.error("Error fetching Notes:", error);
       toast({
-        title: error?.response?.data?.message ,
+        title: error?.response?.data?.message,
         className: "toast-warning",
       });
     }
   };
 
   useEffect(() => {
-   fetchLatestNote()
+    fetchLatestNote();
   }, []);
-//console.log(latestNote , "hbdhdhshh");
-  
+  //console.log(latestNote , "hbdhdhshh");
 
- // console.log(technologies);
-  
   const fetchCandidateDetails = async (candidateId: string) => {
     try {
       const response = await axios.get(`/candidate/${candidateId}`);
@@ -201,38 +197,10 @@ const CandidateDetailsPage = () => {
       setLoading(false);
     }
   };
-  const fetchTechnologies = async () => {
-    try {
-      const response: AxiosResponse<any> = await axios.get(`/technology`);
-      setTechnologies(response.data.data);
-    } catch (error) {
-      console.error("Error fetching technologies:", error);
-      toast({
-        title: error?.response?.data?.message,
-        className: "toast-warning",
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchTechnologies();
-  }, []);
-
-  
-  // const skills = candidate.email;
-  // const skillNames = candidate.skills.map((e) => {
-  //   console.log(e);
-    
-  //   // const tech = technologies.find((tech) => tech._id === e);
-  //   // return tech ? tech.technology_name : "Unknown Technology";
-  // });
-
-  // console.log(skills, "cscsfsfsfsf");
-  
 
   const fetchInterviews = async (candidateId: string) => {
     try {
-    console.log(candidateId);
+      console.log(candidateId);
 
       const response = await axios.get(`/interview/${candidateId}`);
 
@@ -457,7 +425,7 @@ const CandidateDetailsPage = () => {
 
   return (
     <div className="container mx-auto p-6 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-5  text-left text-gray-800 flex justify-between items-center">
+      <h1 className="text-2xl font-bold mb-5 text-left text-gray-800 flex justify-between items-center">
         <span className="ml-5">Candidate Details</span>
         {candidate.resume && (
           <Link
@@ -473,13 +441,15 @@ const CandidateDetailsPage = () => {
       <div className=" w-[100%]  flex gap-5  m-4">
         <div className=" w-[50%] gap-2 border-2 rounded-xl">
           <div className="bg-gray-200 p-4 rounded-t-xl  ">
-            <label className="mx-3 text-lg font-bold" > Basic Info</label>
+            <label className="mx-3 text-lg font-bold"> Basic Info</label>
           </div>
-         
+
           <div className="space-y-5 p-8">
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Candidate Name:</label>
-              <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
+              <label className="text-gray-900">
+                {candidate.first_name} {candidate.last_name}
+              </label>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -498,15 +468,15 @@ const CandidateDetailsPage = () => {
             </div>
 
             <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Technology:</label>
-              <label className="text-gray-900">{candidate.technology?.technology_name}</label>
+              <label className="text-lg font-semibold">Job Role:</label>
+              <label className="text-gray-900">{candidate.job_role}</label>
             </div>
 
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Job Type:</label>
               <label className="text-gray-900">{candidate.type}</label>
             </div>
-            </div>
+          </div>
           <div className="">
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
@@ -741,172 +711,188 @@ const CandidateDetailsPage = () => {
               </Dialog>
             )}
           </div>
-          
         </div>
         <div className="w-[50%] flex flex-col gap-6">
-              <div className="border-2 rounded-xl w-[100%]">
-                <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
-                  <label  className="p-4 text-lg">Candidate Skills</label>
-                </div>
-                <div className="p-8">
-                  <label className="text-xl font-bold">  </label>
-                </div>
-              </div>
+          <div className="border-2 rounded-xl w-[100%] ">
+            <div className="bg-gray-200 p-4 rounded-t-xl text-center font-bold">
+              <label className="p-4 text-2xl"> Skills </label>
+            </div>
 
-              <div className="border-2 rounded-xl  w-[100%]">
-              <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
-                  <label  className="p-4 text-lg">Notes</label>
-                </div>
-                <div className="p-8">
-                  <label className="text-xl font-bold"> </label>
-                </div>
-              </div>
+            <div className="p-5  items-center grid grid-cols-4">
+              {candidate.skills.map(
+                (skill: any, index: Key | null | undefined) => (
+                  <Badge
+                    variant="outline"
+                    key={index}
+                    className=" m-4 justify-center items-center bg-transparent text-black bg-gray-200 border-gray-300 text-[17px]  "
+                  >
+                    {getTechnologyNameById(skill)}
+                  </Badge>
+                )
+              )}
+            </div>
           </div>
-      </div>
 
-      {/* Interview */}
-      <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
-          <span>Scheduled Interviews</span>
-          <Button className="primary" onClick={handleScheduleInterview}>
-            Schedule Interview
-          </Button>
-        </h2>
-        <div className="overflow-x-auto rounded-xl  border-4 ml-3">
-          {interviews.length === 0 ? (
-            <p>No interviews scheduled.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-200 hover:bg-gray-200">
-                  <TableHead>Date</TableHead>
-                  <TableHead>Interview Type</TableHead>
-                  <TableHead>Round</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Notes</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {interviews.map((interview) => (
-                  <TableRow key={interview._id}>
-                    <TableCell>
-                      {moment(interview.interview_date).format(
-                        "Do-MM-YYYY,h:mm:ss a"
-                      )}
-                    </TableCell>
-                    <TableCell>{interview.interview_type}</TableCell>
-                    <TableCell>{interview.round}</TableCell>
-                    <TableCell>{interview.location}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          setOpenNote(true);
-                          setInterviewId(interview._id);
-                          setcandidateId(interview.candidate_id);
-                        }}
-                      >
-                        <FaPlusCircle />
-                      </Button>
-                    </TableCell>
-                    <TableCell className=" capitalize">
-                      {" "}
-                      <Badge variant={statusVariantMap[interview.status]}>
-                        {interview.status}
-                      </Badge>
-                    </TableCell>
-                    {/* <TableCell>
+          <div className="border-2 rounded-xl  w-[100%]">
+            <div className="bg-gray-200 p-4 text-center rounded-t-xl font-bold">
+              <label className="p-4 text-2xl">Notes</label>
+            </div>
+            <div className="p-11 text-center font-light">
+              <label className="text-xl font-semibold">{latestNote}</label>
+            </div>
+          </div>
+        </div>
+</div>
+        {/* Interview */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
+            <span>Scheduled Interviews</span>
+            <Button className="primary" onClick={handleScheduleInterview}>
+              Schedule Interview
+            </Button>
+          </h2>
+          <div className="overflow-x-auto rounded-xl  border-4 ml-3">
+            {interviews.length === 0 ? (
+              <p>No interviews scheduled.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-200 hover:bg-gray-200">
+                    <TableHead>Date</TableHead>
+                    <TableHead>Interview Type</TableHead>
+                    <TableHead>Round</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Notes</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {interviews.map((interview) => (
+                    <TableRow key={interview._id}>
+                      <TableCell>
+                        {moment(interview.interview_date).format(
+                          "Do-MM-YYYY,h:mm:ss a"
+                        )}
+                      </TableCell>
+                      <TableCell>{interview.interview_type}</TableCell>
+                      <TableCell>{interview.round}</TableCell>
+                      <TableCell>{interview.location}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            setOpenNote(true);
+                            setInterviewId(interview._id);
+                            setcandidateId(interview.candidate_id);
+                          }}
+                        >
+                          <FaPlusCircle />
+                        </Button>
+                      </TableCell>
+                      <TableCell className=" capitalize">
+                        {" "}
+                        <Badge variant={statusVariantMap[interview.status]}>
+                          {interview.status}
+                        </Badge>
+                      </TableCell>
+                      {/* <TableCell>
                 
                 </TableCell> */}
 
-                    <TableCell className="space-x-2 text-right">
-                      <Button className="bg-transparent hover:bg-transparent px-1">
-                        <Select
-                          onValueChange={(status) =>
-                            handleStatusChange(interview._id, status, interview)
-                          }
-                          value={interview.status}
-                          // open={statusDropdownOpen === interview._id}
-                          onOpenChange={() =>
-                            setStatusDropdownOpen(interview.status)
-                          }
-                        >
-                          <SelectTrigger className="w-10 text-black">
-                            {/* <MdOutlineEdit className="text-slate-950" /> */}
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="create">Create</SelectItem>
-                            <SelectItem
-                              value="reschedule"
-                              onClick={() => handleReschedule(interview)}
-                            >
-                              Rescheduled
-                            </SelectItem>
-                            <SelectItem value="complete">Complete</SelectItem>
-                            <SelectItem value="rejected">Reject</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="text-blue-600 hover:text-blue-600"
-                        size="icon"
-                        onClick={() => handleEditInterview(interview)}
-                      >
-                        <FaEdit />
-                      </Button>
-                      <AlertDialog
-                        open={deleteDialogOpen}
-                        onOpenChange={setDeleteDialogOpen}
-                      >
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="text-red-600 hover:text-red-600"
-                            size="icon"
-                            onClick={() => handleDeleteInterview(interview._id)}
+                      <TableCell className="space-x-2 text-right">
+                        <Button className="bg-transparent hover:bg-transparent px-1">
+                          <Select
+                            onValueChange={(status) =>
+                              handleStatusChange(
+                                interview._id,
+                                status,
+                                interview
+                              )
+                            }
+                            value={interview.status}
+                            // open={statusDropdownOpen === interview._id}
+                            onOpenChange={() =>
+                              setStatusDropdownOpen(interview.status)
+                            }
                           >
-                            <FaTrash />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Confirm Delete interview scedule
-                            </AlertDialogTitle>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-red-600 hover:bg-red-700"
-                              onClick={confirmDeleteInterview}
+                            <SelectTrigger className="w-10 text-black">
+                              {/* <MdOutlineEdit className="text-slate-950" /> */}
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="create">Create</SelectItem>
+                              <SelectItem
+                                value="reschedule"
+                                onClick={() => handleReschedule(interview)}
+                              >
+                                Rescheduled
+                              </SelectItem>
+                              <SelectItem value="complete">Complete</SelectItem>
+                              <SelectItem value="rejected">Reject</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="text-blue-600 hover:text-blue-600"
+                          size="icon"
+                          onClick={() => handleEditInterview(interview)}
+                        >
+                          <FaEdit />
+                        </Button>
+                        <AlertDialog
+                          open={deleteDialogOpen}
+                          onOpenChange={setDeleteDialogOpen}
+                        >
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="text-red-600 hover:text-red-600"
+                              size="icon"
+                              onClick={() =>
+                                handleDeleteInterview(interview._id)
+                              }
                             >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                              <FaTrash />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Confirm Delete interview scedule
+                              </AlertDialogTitle>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-600 hover:bg-red-700"
+                                onClick={confirmDeleteInterview}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
         </div>
-      </div>
 
-      {interviewId && openNote && (
-        <NoteManager
-          interviewId={interviewId}
-          candidateId={candidateId}
-          openNote={openNote}
-          setOpenNote={setOpenNote}
-        />
-      )}
-    </div>
+        {interviewId && openNote && (
+          <NoteManager
+            interviewId={interviewId}
+            candidateId={candidateId}
+            openNote={openNote}
+            setOpenNote={setOpenNote}
+            latesnotes={fetchLatestNote()}
+          />
+        )}
+      </div>
   );
 };
 

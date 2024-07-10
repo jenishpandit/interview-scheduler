@@ -24,9 +24,10 @@ interface NoteManagerProps {
     candidateId:string
     openNote: boolean;
     setOpenNote: (note: boolean) => void;
+    latesnotes: () => void;
 }
 
-const NoteManager = ({ interviewId,candidateId, openNote, setOpenNote }: NoteManagerProps) => {
+const NoteManager = ({ interviewId,candidateId, openNote, setOpenNote  ,latesnotes}: NoteManagerProps) => {
     const [notes, setNotes] = useState<any[]>([]);
     const { register, handleSubmit, reset, formState: { errors } } = useForm<NoteFormData>({
         resolver: zodResolver(noteSchema),
@@ -41,6 +42,7 @@ const NoteManager = ({ interviewId,candidateId, openNote, setOpenNote }: NoteMan
         try {
             const response = await axios.get(`/note/${interviewId}`);
             setNotes(response.data.data);
+            latesnotes
         } catch (error) {
             console.error('Error fetching notes:', error);
         }

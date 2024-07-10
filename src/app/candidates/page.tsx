@@ -152,7 +152,7 @@ const Page: React.FC = () => {
 
   const fetchCandidates = async () => {
     try {
-      const response: AxiosResponse<FormData[]> = await axios.get(`/candidate?fil` );
+      const response: AxiosResponse<FormData[]> = await axios.get(`/candidate` );
       setCandidates(response.data.data);
     } catch (error) {
       console.error("Error fetching candidates:", error);
