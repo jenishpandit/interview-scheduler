@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { FaTachometerAlt, FaLaptopCode, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaTachometerAlt, FaLaptopCode, FaUser, FaSignOutAlt, } from "react-icons/fa";
+import { FaFileCircleQuestion } from "react-icons/fa6";
 import { Button } from "./ui/button";
 
 const Sidebar = () => {
@@ -50,16 +51,7 @@ const Sidebar = () => {
               <FaUser className="mr-2" /> Candidates
             </div>
           </Link>
-          <Link href="/notes">
-            <div
-              className={cn(
-                "mb-4 p-2 flex items-center rounded",
-                pathname === "" && ""
-              )}
-            >
-             
-            </div>
-          </Link>
+          
         </nav>
       </div>
       <div className="p-4 sm:mt-52 mt-52 md:mt-52 lg:mt-52 xl:mt-72 ">

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "../../lib/axios";
 import Link from "next/link";
@@ -49,7 +49,6 @@ import { Input } from "@/components/ui/input";
 import NoteManager from "@/components/NoteManager";
 import { MdOutlineEdit } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
-import { AxiosResponse } from "axios";
 
 interface ICandidate {
   _id: string;
@@ -105,6 +104,8 @@ const CandidateDetailsPage = () => {
   );
   const [interviewId, setInterviewId] = useState<null | any>(null);
   const [candidateId, setcandidateId] = useState<null | any>(null);
+  const [technologies, setTechnologies] = useState<any[]>([]);
+  const [latestNote, setLatestNote] = useState<any[]>([]);
   const [openNote, setOpenNote] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>();
@@ -138,6 +139,56 @@ const CandidateDetailsPage = () => {
   }, [id]);
   console.log(selectedItem, ": dsdsfsfsfv");
 
+  const getTechnologyNameById = (id: any) => {
+    const technology = technologies.find(tech => tech._id === id);
+    return technology ? technology.technology_name : 'Unknown Technology';
+  };
+
+  const fetchTechnologies = async () => {
+    try {
+      const response: AxiosResponse<any> = await axios.get(`/technology`);
+      setTechnologies(response.data.data);
+    } catch (error) {
+      console.error("Error fetching technologies:", error);
+      toast({
+        title: error?.response?.data?.message,
+        className: "toast-warning",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchTechnologies();
+  }, []);
+
+  const fetchLatestNote = async () => {
+    try {
+      const response: AxiosResponse<any> = await axios.get(`/note/latest`);
+      const noteText = response.data.data.note_text;
+      //console.log("Latest Note", noteText);
+      setLatestNote(noteText);
+     // console.log(setLatestNote(),"setsdsdsdws");
+      
+    // console.log(noteText,"====latest note"); 
+      
+
+    } catch (error) {
+      console.error("Error fetching Notes:", error);
+      toast({
+        title: error?.response?.data?.message ,
+        className: "toast-warning",
+      });
+    }
+  };
+
+  useEffect(() => {
+   fetchLatestNote()
+  }, []);
+//console.log(latestNote , "hbdhdhshh");
+  
+
+ // console.log(technologies);
+  
   const fetchCandidateDetails = async (candidateId: string) => {
     try {
       const response = await axios.get(`/candidate/${candidateId}`);
@@ -181,7 +232,7 @@ const CandidateDetailsPage = () => {
 
   const fetchInterviews = async (candidateId: string) => {
     try {
-      console.log(candidateId);
+    console.log(candidateId);
 
       const response = await axios.get(`/interview/${candidateId}`);
 
@@ -406,8 +457,8 @@ const CandidateDetailsPage = () => {
 
   return (
     <div className="container mx-auto p-6 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-5 text-left text-gray-800 flex justify-between items-center">
-        <span>Candidate Details</span>
+      <h1 className="text-2xl font-bold mb-5  text-left text-gray-800 flex justify-between items-center">
+        <span className="ml-5">Candidate Details</span>
         {candidate.resume && (
           <Link
             href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
@@ -422,15 +473,13 @@ const CandidateDetailsPage = () => {
       <div className=" w-[100%]  flex gap-5  m-4">
         <div className=" w-[50%] gap-2 border-2 rounded-xl">
           <div className="bg-gray-200 p-4 rounded-t-xl  ">
-            <label className="mx-3 text-lg font-bold"> Basic Info</label>
+            <label className="mx-3 text-lg font-bold" > Basic Info</label>
           </div>
-
+         
           <div className="space-y-5 p-8">
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Candidate Name:</label>
-              <label className="text-gray-900">
-                {candidate.first_name} {candidate.last_name}
-              </label>
+              <label className="text-gray-900">{candidate.first_name} {candidate.last_name}</label>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -449,15 +498,15 @@ const CandidateDetailsPage = () => {
             </div>
 
             <div className="flex items-center space-x-2">
-              <label className="text-lg font-semibold">Job Role:</label>
-              <label className="text-gray-900">{candidate.job_role}</label>
+              <label className="text-lg font-semibold">Technology:</label>
+              <label className="text-gray-900">{candidate.technology?.technology_name}</label>
             </div>
 
             <div className="flex items-center space-x-2">
               <label className="text-lg font-semibold">Job Type:</label>
               <label className="text-gray-900">{candidate.type}</label>
             </div>
-          </div>
+            </div>
           <div className="">
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
@@ -692,31 +741,32 @@ const CandidateDetailsPage = () => {
               </Dialog>
             )}
           </div>
+          
         </div>
         <div className="w-[50%] flex flex-col gap-6">
-          <div className="border-2 rounded-xl w-[100%]">
-            <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
-              <label className="p-4 text-lg">Candidate Skills</label>
-            </div>
-            <div className="p-8">
-              <label className="text-xl font-bold"> </label>
-            </div>
-          </div>
+              <div className="border-2 rounded-xl w-[100%]">
+                <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
+                  <label  className="p-4 text-lg">Candidate Skills</label>
+                </div>
+                <div className="p-8">
+                  <label className="text-xl font-bold">  </label>
+                </div>
+              </div>
 
-          <div className="border-2 rounded-xl  w-[100%]">
-            <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
-              <label className="p-4 text-lg">Notes</label>
-            </div>
-            <div className="p-8">
-              <label className="text-xl font-bold"> </label>
-            </div>
+              <div className="border-2 rounded-xl  w-[100%]">
+              <div className="bg-gray-200 p-4 rounded-t-xl font-bold">
+                  <label  className="p-4 text-lg">Notes</label>
+                </div>
+                <div className="p-8">
+                  <label className="text-xl font-bold"> </label>
+                </div>
+              </div>
           </div>
-        </div>
       </div>
 
       {/* Interview */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
           <span>Scheduled Interviews</span>
           <Button className="primary" onClick={handleScheduleInterview}>
             Schedule Interview

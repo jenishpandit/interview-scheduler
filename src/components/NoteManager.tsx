@@ -60,6 +60,7 @@ const NoteManager = ({ interviewId,candidateId, openNote, setOpenNote }: NoteMan
 
         try {
             const response = await axios.post('/note', postData);
+            console.log(response.data,"===================");
             if (response.data.code === 200) {
                 fetchNotes();
             }
