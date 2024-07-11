@@ -47,8 +47,10 @@ import { AxiosResponse } from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import MultipleSelector from "@/components/ui/multiple-selector";
 import { Search } from "lucide-react";
-import useDebounce from "@/hooks/useDebounce";
-import useSearch from "@/hooks/useDebounce";
+import { ImSpinner6 } from "react-icons/im";
+// import useDebounce from "@/hooks/useDebounce";
+import * as _ from "lodash";
+
 const schema = z.object({
   first_name: z.string().min(1, "First Name is required"),
   last_name: z.string().min(1, "Last Name is required"),
@@ -93,6 +95,7 @@ const defaultValues: any = {
 
 type FormData = z.infer<typeof schema>;
 
+// Candidate Home Page
 const Page: React.FC = () => {
   const {
     register,
@@ -105,9 +108,8 @@ const Page: React.FC = () => {
     resolver: zodResolver(schema),
     defaultValues,
   });
-  // const [filteredRoles, setFilteredRoles] = React.useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [candidates, setCandidates] = useState<FormData[]>([]);
   const [technologies, setTechnologies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -119,12 +121,13 @@ const Page: React.FC = () => {
   const [resumeFile, setResumeFile] = useState<string | File | null>(null);
   const { toast } = useToast();
   const [query, setQuery] = useState("");
+  const [searching, setSearching] = useState<boolean>(false);
 
-  const handleInputChange = (event:any) => {
+  //handle input change
+  const handleInputChange = (event: any) => {
+    setSearching(true);
     setQuery(event.target.value);
   };
-  
-  const   debouncedHandleInputChange = useDebounce(handleInputChange, 500);
 
   const handleChange = (event: any) => {
     setSearchTerm(event.target.value);
@@ -133,11 +136,13 @@ const Page: React.FC = () => {
     );
     setSearchResults(results);
   };
+
+  //fetch Technologies data
   const fetchTechnologies = async () => {
     try {
       const response: AxiosResponse<any> = await axios.get(`/technology`);
       setTechnologies(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching technologies:", error);
       toast({
         title: error?.response?.data?.message,
@@ -150,11 +155,15 @@ const Page: React.FC = () => {
     fetchTechnologies();
   }, []);
 
+  //fetch Candidate Data
   const fetchCandidates = async () => {
     try {
-      const response: AxiosResponse<FormData[]> = await axios.get(`/candidate` );
+      const response: AxiosResponse<any> = await axios.get(
+        `/candidate?filters=${query}`
+      );
       setCandidates(response.data.data);
-    } catch (error) {
+      setSearching(false)
+    } catch (error: any) {
       console.error("Error fetching candidates:", error);
       toast({
         title: error?.response?.data?.message,
@@ -163,6 +172,23 @@ const Page: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (query) {
+      debounceFunctionForSearch();
+      return () => debounceFunctionForSearch.cancel();
+    } else {
+      fetchCandidates();
+    }
+  }, [query]);
+
+  const debounceFunctionForSearch = _.debounce(async () => {
+    await fetchCandidates();
+    setSearching(false);
+  }, 500);
+
+  console.log(query, "query =============");
+
+  //fetch Role
   const fetchRole = async () => {
     try {
       const res = await axios.get("/candidate/roles");
@@ -178,10 +204,7 @@ const Page: React.FC = () => {
     fetchRole();
   }, []);
 
-  useEffect(() => {
-    fetchCandidates();
-  }, []);
-
+  //Candidate Data Add
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
       const formData = new FormData();
@@ -231,7 +254,7 @@ const Page: React.FC = () => {
       reset();
       setIsDialogOpen(false);
       setEditCandidateId(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding/updating candidate:", error);
       toast({
         title: error?.response?.data?.message,
@@ -240,6 +263,7 @@ const Page: React.FC = () => {
     }
   };
 
+  //Delete Candidate Data
   const deleteCandidate = async () => {
     if (candidateToDelete) {
       try {
@@ -250,7 +274,7 @@ const Page: React.FC = () => {
         });
         fetchCandidates();
         setCandidateToDelete(null);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error deleting candidate:", error);
         toast({
           title: error?.response?.data?.message,
@@ -260,8 +284,9 @@ const Page: React.FC = () => {
     }
   };
 
+  //edit Candidate Data
   const editCandidate = (id: string) => {
-    const candidate = candidates.find((c) => c._id === id);
+    const candidate = candidates.find((c: any) => c._id === id);
     if (candidate) {
       setValue("first_name", candidate.first_name);
       setValue("last_name", candidate.last_name);
@@ -278,6 +303,7 @@ const Page: React.FC = () => {
     }
   };
 
+  //handle Candidate Data
   const handleAddCandidate = () => {
     reset();
     setEditCandidateId(null);
@@ -286,15 +312,12 @@ const Page: React.FC = () => {
     setCandidateToDelete(null);
   };
 
+  //Delete Resume
   const handleDeleteResume = () => {
     setResumeFile(null);
     setValue("resume", null);
   };
-  // console.log(jobRole);
 
-  useEffect(() => {
-    fetchTechnologies();
-  }, []);
   return (
     <>
       <div className="flex ">
@@ -302,17 +325,20 @@ const Page: React.FC = () => {
           <h1 className="text-2xl font-bold">Candidates</h1>
         </div>
         <div className="relative ml-auto flex-1 md:grow-0 flex items-center">
-          <Search className="absolute left-2.5 top-2.5 h-[50px] w-4 text-muted-foreground" />
-          <div className="spinner">
-            <i className="fa fa-spinner"></i>
-          </div>
+          {searching ? (
+            <div className="absolute left-1 animate-spin">
+              <ImSpinner6 className="w-8 text-[16px]" />
+            </div>
+          ) : (
+            <Search className="absolute left-2.5 top-2.5 h-[50px] w-4 text-muted-foreground" />
+          )}
           <Input
-            // onChange={(e) => setQuery(e.target.value.toLocaleLowerCase())}
             value={query}
-            onChange={debouncedHandleInputChange}
+            onChange={handleInputChange}
             type="search"
             placeholder="Search..."
-            className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[290px] active:outline-none focus:outline-none focus-visible:shadow-none focus-visible:ring-1 focus-visible:ring-offset-0"
+            className="w-full rounded-lg bg-background pl-9 md:w-[200px] lg:w-[290px] active:outline-none focus:outline-none focus-visible:shadow-none focus-visible:ring-1 focus-visible:ring-offset-0"
+            // disabled={searching} // Disable input when searching
           />
         </div>
         <div className=" p-4 flex flex-col items-end">
@@ -649,95 +675,85 @@ const Page: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {candidates
-              // .filter(
-              //   (candidate: any) =>
-              //     candidate.email.toLowerCase().includes(query) ||
-              //     candidate.first_name.toLowerCase().includes(query) ||
-              //     candidate.last_name.toLowerCase().includes(query) ||
-              //     candidate.job_role.toLowerCase().includes(query)
-              // )
-              .map((candidate: any) => (
-                <TableRow key={candidate._id}>
-                  <TableCell>
-                    {candidate.first_name} {candidate.last_name}
-                  </TableCell>
-                  <TableCell>{candidate.email}</TableCell>
-                  <TableCell className=" capitalize">
-                    {candidate.job_role}
-                  </TableCell>
-                  <TableCell>{candidate.type}</TableCell>
-                  <TableCell>
-                    {candidate.resume && (
-                      <Link
-                        href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline"
-                      >
-                        <Image
-                          src="/resume.png"
-                          width={30}
-                          height={40}
-                          alt=""
-                          className="ml-2"
-                        />
-                      </Link>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="text-blue-600 hover:text-blue-600"
-                      >
-                        <FaEdit
-                          className=" "
-                          onClick={() => editCandidate(candidate._id)}
-                        />
-                      </Button>
-
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="text-red-600 hover:text-red-600"
-                            size="icon"
-                          >
-                            <FaTrash
-                              onClick={() =>
-                                setCandidateToDelete(candidate?._id)
-                              }
-                            />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Are you sure you want to delete this candidate?
-                            </AlertDialogTitle>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-red-600 hover:bg-red-700"
-                              onClick={deleteCandidate}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Link href={`/candidates/${candidate._id}`} passHref>
-                      <FaEye className="text-2xl text-slate-800" />
+            {candidates.map((candidate: any) => (
+              <TableRow key={candidate._id}>
+                <TableCell>
+                  {candidate.first_name} {candidate.last_name}
+                </TableCell>
+                <TableCell>{candidate.email}</TableCell>
+                <TableCell className=" capitalize">
+                  {candidate.job_role}
+                </TableCell>
+                <TableCell>{candidate.type}</TableCell>
+                <TableCell>
+                  {candidate.resume && (
+                    <Link
+                      href={`${process.env.NEXT_PUBLIC_API_URL}/${candidate.resume}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      <Image
+                        src="/resume.png"
+                        width={30}
+                        height={40}
+                        alt=""
+                        className="ml-2"
+                      />
                     </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-blue-600 hover:text-blue-600"
+                    >
+                      <FaEdit
+                        className=" "
+                        onClick={() => editCandidate(candidate._id)}
+                      />
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="text-red-600 hover:text-red-600"
+                          size="icon"
+                        >
+                          <FaTrash
+                            onClick={() => setCandidateToDelete(candidate?._id)}
+                          />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you sure you want to delete this candidate?
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-red-600 hover:bg-red-700"
+                            onClick={deleteCandidate}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Link href={`/candidates/${candidate._id}`} passHref>
+                    <FaEye className="text-2xl text-slate-800" />
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>

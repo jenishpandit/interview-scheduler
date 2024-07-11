@@ -42,7 +42,7 @@ const NoteManager = ({ interviewId,candidateId, openNote, setOpenNote  ,latesnot
         try {
             const response = await axios.get(`/note/${interviewId}`);
             setNotes(response.data.data);
-            latesnotes
+            latesnotes  
         } catch (error) {
             console.error('Error fetching notes:', error);
         }
