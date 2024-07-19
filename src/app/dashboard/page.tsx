@@ -81,7 +81,7 @@ const page = () => {
   useEffect(() => {// Update filtered interviews when tab changes
   }, [selectedTab, getinterview]);
 
-console.log(getinterview);
+// console.log(getinterview);
   //  console.log("=======",getinterview)
   return (
     <>

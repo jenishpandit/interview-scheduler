@@ -186,7 +186,6 @@ const Page: React.FC = () => {
     setSearching(false);
   }, 500);
 
-  console.log(query, "query =============");
 
   //fetch Role
   const fetchRole = async () => {
@@ -391,7 +390,7 @@ const Page: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Email
@@ -407,6 +406,8 @@ const Page: React.FC = () => {
                       </p>
                     )}
                   </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Phone
@@ -419,105 +420,6 @@ const Page: React.FC = () => {
                     {errors.phone_number && (
                       <p className="text-sm text-red-600">
                         {errors.phone_number.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* <div>
-                    <Label htmlFor="technology_id">Technology</Label>
-                    <Controller
-                      name="technology_id"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a technology" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {technologies.map((tech) => (
-                              <SelectItem key={tech._id} value={tech._id}>
-                                {tech.technology_name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.technology_id && (
-                      <p className="text-sm text-red-600">
-                        {errors.technology_id.message}
-                      </p>
-                    )}
-                  </div> */}
-                  <div className="mb-4">
-                    <Label htmlFor="skills">Skills</Label>
-                    <Controller
-                      name="skills"
-                      control={control}
-                      render={({ field }) => (
-                        <div className="flex">
-                          <MultipleSelector
-                            className=""
-                            placeholder="Skills Select..."
-                            defaultOptions={technologies.map((role) => ({
-                              value: role._id,
-                              label: role.technology_name,
-                            }))}
-                            onChange={(selected) => {
-                              // Update the selected values in the form state
-                              field.onChange(selected.map((s) => s.value));
-                            }}
-                            value={
-                              Array.isArray(field.value)
-                                ? field.value.map((value) => ({
-                                    value: value,
-                                    label:
-                                      technologies.find(
-                                        (tech) => tech._id === value
-                                      )?.technology_name || value,
-                                  }))
-                                : []
-                            }
-                            emptyIndicator={
-                              <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                no results found.
-                              </p>
-                            }
-                          />
-                        </div>
-                      )}
-                    />
-                    {errors.skills && (
-                      <p className="text-red-500">{errors.skills.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="jobType">Job Type</Label>
-                    <Controller
-                      name="type"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Job Type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="WFH">WFH</SelectItem>
-                            <SelectItem value="office">Office</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.type && (
-                      <p className="text-sm text-red-600">
-                        {errors.type.message}
                       </p>
                     )}
                   </div>
@@ -548,6 +450,67 @@ const Page: React.FC = () => {
                       </p>
                     )}
                   </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+                  {/* <div>
+                    <Label htmlFor="technology_id">Technology</Label>
+                    <Controller
+                      name="technology_id"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a technology" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {technologies.map((tech) => (
+                              <SelectItem key={tech._id} value={tech._id}>
+                                {tech.technology_name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.technology_id && (
+                      <p className="text-sm text-red-600">
+                        {errors.technology_id.message}
+                      </p>
+                    )}
+                  </div> */}
+                 
+                  <div>
+                    <Label htmlFor="jobType">Job Type</Label>
+                    <Controller
+                      name="type"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Job Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="WFH">WFH</SelectItem>
+                            <SelectItem value="office">Office</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.type && (
+                      <p className="text-sm text-red-600">
+                        {errors.type.message}
+                      </p>
+                    )}
+                  </div>
+                  
                   <div>
                     {/* <Label htmlFor="job_role">Job Role</Label>
                     <Controller
@@ -610,8 +573,51 @@ const Page: React.FC = () => {
                       </p>
                     )}
                   </div>
-                </div>
+                  </div>
+                {/* </div> */}
                 <div>
+                <div className="mb-4">
+                    <Label htmlFor="skills">Skills</Label>
+                    <Controller
+                      name="skills"
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex">
+                          <MultipleSelector
+                            className=""
+                            placeholder="Skills Select..."
+                            defaultOptions={technologies.map((role) => ({
+                              value: role._id,
+                              label: role.technology_name,
+                            }))}
+                            onChange={(selected) => {
+                              // Update the selected values in the form state
+                              field.onChange(selected.map((s) => s.value));
+                            }}
+                            value={
+                              Array.isArray(field.value)
+                                ? field.value.map((value) => ({
+                                    value: value,
+                                    label:
+                                      technologies.find(
+                                        (tech) => tech._id === value
+                                      )?.technology_name || value,
+                                  }))
+                                : []
+                            }
+                            emptyIndicator={
+                              <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                no results found.
+                              </p>
+                            }
+                          />
+                        </div>
+                      )}
+                    />
+                    {errors.skills && (
+                      <p className="text-red-500">{errors.skills.message}</p>
+                    )}
+                  </div>
                   <label className="block text-sm font-medium text-gray-700">
                     Resume
                   </label>

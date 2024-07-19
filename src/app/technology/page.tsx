@@ -48,7 +48,7 @@ const Page: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [technologyToDelete, setTechnologyToDelete] = useState<Technology | null>(null);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { toast }:any = useToast();
 
 
   const form = useForm({
@@ -63,9 +63,9 @@ const Page: React.FC = () => {
   const fetchTechnologies = async () => {
     try {
       const response = await axios.get<{ data: Technology[] }>(`/technology`);
-      console.log("Fetched technologies:", response.data.data);
+      // console.log("Fetched technologies:", response.data.data);
       setTechnologies(response.data.data);
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch technologies");
       toast({
@@ -102,7 +102,7 @@ const Page: React.FC = () => {
       setDuplicateError(null);
       clearErrors("technology_name");
       fetchTechnologies();
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error submitting form:", error);
       toast({
         title: error?.response?.data?.message,
@@ -120,10 +120,10 @@ const Page: React.FC = () => {
       console.log("Response after adding technology:", response.data.data);
       fetchTechnologies();
       toast({
-        title: response.data.message,
+        title : response.data.message,
         className:"toast-success",
       });
-    } catch (error) {
+    } catch (error :any) {
       console.error("Error adding technology:", error);
       toast({
        title:error?.response?.data?.message,
@@ -144,11 +144,11 @@ const Page: React.FC = () => {
       setEditingTechnology(null);
       fetchTechnologies();
       toast({
-        title:response.data.message,
+        title:response?.data?.message,
         className:"toast-success",
 
       });
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error updating technology:", error);
       setError("Failed to update technology");
       toast({
@@ -172,7 +172,7 @@ const Page: React.FC = () => {
         className:"toast-success",
 
       });
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error deleting technology:", error);
       toast({
         title: error?.response?.data?.message,

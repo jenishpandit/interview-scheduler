@@ -48,7 +48,7 @@ const Page: React.FC = () => {
 
     const fetchTechnologies = async () => {
         try {
-            const response: AxiosResponse<any[]> = await axios.get(`/technology/readAll`);
+            const response: AxiosResponse<any> = await axios.get(`/technology/readAll`);
             setTechnologies(response.data.data);
         } catch (error) {
             console.error('Error fetching technologies:', error);
@@ -61,7 +61,7 @@ const Page: React.FC = () => {
 
     const fetchCandidates = async () => {
         try {
-            const response: AxiosResponse<FormData[]> = await axios.get(`/candidate/readAll`);
+            const response: AxiosResponse<FormData[] | any> = await axios.get(`/candidate/readAll`);
             setCandidates(response.data.data);
         } catch (error) {
             console.error('Error fetching candidates:', error);
@@ -107,7 +107,7 @@ const Page: React.FC = () => {
     };
 
     const editCandidate = (id: string) => {
-        const candidate = candidates.find((c) => c._id === id);
+        const candidate = candidates.find((c:any) => c._id === id);
         if (candidate) {
             setEditCandidateId(id);
             setIsDialogOpen(true);
@@ -211,7 +211,7 @@ const Page: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {candidates.map((candidate) => (
+                    {candidates.map((candidate:any) => (
                         <TableRow key={candidate._id}>
                             <TableCell>{candidate.interviewType}</TableCell>
                             <TableCell>{moment(candidate.interviewDate).format("PPP")}</TableCell>

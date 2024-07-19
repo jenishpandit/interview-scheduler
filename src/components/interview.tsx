@@ -55,7 +55,7 @@ const TodayInterview: React.FC<TodayInterviewProps> = ({ Gettecnology, selectedT
                 <TableCell>
                   {moment(interview.interview_date).format("h:mm:ss A")}
                 </TableCell>
-                <TableCell className="">
+                <TableCell className=" capitalize">
                 {interview?.candidate_id &&
                     <Link className="hover:underline" href={`/candidates/${interview?.candidate_id?._id}`}>
                     {interview.candidate_id.first_name}{" "}

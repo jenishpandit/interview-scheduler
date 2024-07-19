@@ -104,24 +104,19 @@ const CandidateDetailsPage = () => {
     null
   );
   const [technologies, setTechnologies] = useState<any[]>([]);
-  const [latestNote, setLatestNote] = useState<any[]>([]);
+  const [latestNote, setLatestNote] = useState<any>([]);
   const [interviewId, setInterviewId] = useState<null | any>(null);
   const [candidateId, setcandidateId] = useState<null | any>(null);
   const [openNote, setOpenNote] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>();
   const [selectedItem, setSelectedItem] = useState<IInterview | null>(null);
-  const [newDate, setNewDate] = useState(null);
   const [showInterviewId, SetshowInterviewId] = useState<any>([]);
-  const [latestInterviewId, setLatestInterviewId] = useState<any>("");
-
-  // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [sheduleinterview, setsheduleinterview] = useState<IInterview | null>(
     null
   );
-
+  const [shownotesCandidate, SetShownotesCandidate] = useState<any>();
   const { toast } = useToast();
-
   const handleReschedule = (interview: IInterview) => {
     // console.log(interview, "Reschedule clicked");
     setValue("round", interview.round);
@@ -140,7 +135,6 @@ const CandidateDetailsPage = () => {
     }
   }, [id]);
 
-  console.log(selectedItem, ": dsdsfsfsfv");
 
   const getTechnologyNameById = (id: any) => {
     const technology = technologies.find((tech) => tech._id === id);
@@ -164,43 +158,12 @@ const CandidateDetailsPage = () => {
     fetchTechnologies();
   }, []);
 
-  const DataShow = showInterviewId.map((e) => {
-    console.log("hello", e._id);
-    return e._id;
-  });
-
-  console.log(DataShow,"dsfsf");
-  
-  // const findID = DataShow.map((e) =>e)
-  
-
-  const fetchLatestNote = async () => {
-    try {
-      const response: AxiosResponse<any> = await axios.get(`/note/latest`);
-      // console.log(response);
-
-      // const noteText = response.data.data.note_text;
-      const notedata = response.data.data;
-      setLatestNote(notedata);
-      setLatestInterviewId(notedata);
-    } catch (error: any) {
-      console.error("Error fetching Notes:", error);
-      toast({
-        title: error?.response?.data?.message,
-        className: "toast-warning",
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchLatestNote();
-  }, []);
-
   const fetchCandidateDetails = async (candidateId: string) => {
     try {
       const response = await axios.get(`/candidate/${candidateId}`);
       const candidateData = response.data.data;
       setCandidate(candidateData);
+      SetShownotesCandidate(candidateId);
     } catch (error) {
       console.error("Error fetching candidate details:", error);
       setCandidate(null);
@@ -211,14 +174,13 @@ const CandidateDetailsPage = () => {
 
   const fetchInterviews = async (candidateId: string) => {
     try {
-      console.log(candidateId);
-
+      // console.log(candidateId);
       const response = await axios.get(`/interview/${candidateId}`);
 
-      console.log("response = ", response);
+      // console.log("response = ", response);
 
       const interviewData = response.data.data;
-      console.log(interviewData);
+      // console.log(interviewData);
 
       setInterviews(interviewData);
       SetshowInterviewId(interviewData);
@@ -232,7 +194,7 @@ const CandidateDetailsPage = () => {
     }
   };
 
-  console.log(showInterviewId, "show interviewId");
+  // console.log(showInterviewId, "show interviewId");  
 
   const {
     register,
@@ -251,6 +213,29 @@ const CandidateDetailsPage = () => {
     },
   });
 
+
+  const fetchLatestNote = async () => {
+    // console.log(id ,"cdfsfsf");
+    
+    try {
+      const response: AxiosResponse<any> = await axios.get(`/note/latest/${id}`);
+      const noteText = response.data.data;
+      setLatestNote(noteText);
+
+    } catch (error: any) {
+      console.error("Error fetching Notes:", error);
+      toast({
+        title: error?.response?.data?.message,
+        className: "toast-warning",
+      });
+    }
+  };
+
+  // console.log(shownotesCandidate ,"cdfdgdfgfddddddddd");
+  
+  useEffect(() => {
+    fetchLatestNote();
+  }, [shownotesCandidate]);
   const OnResubmit: SubmitHandler<InterviewFormValues> = async (data) => {
     console.log("data", data);
 
@@ -436,6 +421,9 @@ const CandidateDetailsPage = () => {
       </div>
     );
   }
+
+  
+  // console.log(shownotesCandidate === latestNote.candidate, "canndateId+++++");
 
   return (
     <div className="container mx-auto p-6 bg-gray-50">
@@ -753,13 +741,15 @@ const CandidateDetailsPage = () => {
             </div>
             <div className="p-11 text-center font-light">
               <label className="text-xl font-semibold">
-                {latestNote}
-                {showInterviewId.map((e:any) =>
+                {/* {shownotesCandidate === candidateId ? ( */}
+                  <p>{latestNote.note_text}</p>
+                {/* ) : null} */}
+                {/* {showInterviewId.map((e:any) =>
                   e._id === latestNote.interview_id ? (
                     <p key={e._id}>{latestNote.note_text}</p>
                   ) : null
-                )}
-                </label>
+                )} */}
+              </label>
             </div>
           </div>
         </div>
@@ -904,7 +894,7 @@ const CandidateDetailsPage = () => {
           candidateId={candidateId}
           openNote={openNote}
           setOpenNote={setOpenNote}
-          latesnotes={fetchLatestNote()}
+          latesnotes={fetchLatestNote}
         />
       )}
     </div>
