@@ -24,7 +24,6 @@ import moment from "moment";
 import { FaEdit, FaTrash, FaPlusCircle } from "react-icons/fa";
 import {
   Table,
-  TableCaption,
   TableHeader,
   TableRow,
   TableHead,
@@ -32,22 +31,18 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { Activity } from "lucide-react";
 
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
 import NoteManager from "@/components/NoteManager";
-import { MdOutlineEdit } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
 import { AxiosResponse } from "axios";
 
@@ -135,7 +130,6 @@ const CandidateDetailsPage = () => {
     }
   }, [id]);
 
-
   const getTechnologyNameById = (id: any) => {
     const technology = technologies.find((tech) => tech._id === id);
     return technology ? technology.technology_name : "Unknown Technology";
@@ -143,8 +137,10 @@ const CandidateDetailsPage = () => {
 
   const fetchTechnologies = async () => {
     try {
-      const response: AxiosResponse<any> = await axios.get(`/technology`);
-      setTechnologies(response.data.data);
+      const response: AxiosResponse<any> = await axios.get(
+        `/technology?limit=0`
+      );
+      setTechnologies(response.data.data.data);
     } catch (error: any) {
       console.error("Error fetching technologies:", error);
       toast({
@@ -194,8 +190,6 @@ const CandidateDetailsPage = () => {
     }
   };
 
-  // console.log(showInterviewId, "show interviewId");  
-
   const {
     register,
     handleSubmit,
@@ -213,15 +207,15 @@ const CandidateDetailsPage = () => {
     },
   });
 
-
   const fetchLatestNote = async () => {
     // console.log(id ,"cdfsfsf");
-    
+
     try {
-      const response: AxiosResponse<any> = await axios.get(`/note/latest/${id}`);
+      const response: AxiosResponse<any> = await axios.get(
+        `/note/latest/${id}`
+      );
       const noteText = response.data.data;
       setLatestNote(noteText);
-
     } catch (error: any) {
       console.error("Error fetching Notes:", error);
       toast({
@@ -230,9 +224,6 @@ const CandidateDetailsPage = () => {
       });
     }
   };
-
-  // console.log(shownotesCandidate ,"cdfdgdfgfddddddddd");
-  
   useEffect(() => {
     fetchLatestNote();
   }, [shownotesCandidate]);
@@ -422,8 +413,7 @@ const CandidateDetailsPage = () => {
     );
   }
 
-  
-  // console.log(shownotesCandidate === latestNote.candidate, "canndateId+++++");
+  console.log(latestNote, "canndateId+++++");
 
   return (
     <div className="container mx-auto p-6 bg-gray-50">
@@ -483,12 +473,6 @@ const CandidateDetailsPage = () => {
             {selectedItem ? (
               <Dialog open={RedialogOpen} onOpenChange={setReDialogOpen}>
                 <DialogTrigger asChild>
-                  {/* <Button
-                    className="bg-blue-500 hover:bg-blue-600 "
-                    onClick={handleScheduleInterview}
-                  >
-                    Schedule Interview
-                  </Button> */}
                 </DialogTrigger>
                 <DialogContent>
                   <DialogTitle>Reschedule Interview</DialogTitle>
@@ -740,15 +724,19 @@ const CandidateDetailsPage = () => {
               <label className="p-4 text-2xl">Notes</label>
             </div>
             <div className="p-11 text-center font-light">
-              <label className="text-xl font-semibold">
-                {/* {shownotesCandidate === candidateId ? ( */}
-                  <p>{latestNote.note_text}</p>
-                {/* ) : null} */}
-                {/* {showInterviewId.map((e:any) =>
-                  e._id === latestNote.interview_id ? (
-                    <p key={e._id}>{latestNote.note_text}</p>
-                  ) : null
-                )} */}
+              <label className="">
+                {latestNote &&
+                showInterviewId.some(
+                  (e:any) => e._id === latestNote.interview_id
+                ) ? (
+                  <p className="text-xl font-semibold">
+                    {latestNote.note_text}
+                  </p>
+                ) : (
+                  <p className="text-gray-400 text-[15px] font-normal ">
+                    No notes available
+                  </p>
+                )}
               </label>
             </div>
           </div>
@@ -886,6 +874,7 @@ const CandidateDetailsPage = () => {
             </Table>
           )}
         </div>
+
       </div>
 
       {interviewId && openNote && (

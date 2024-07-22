@@ -42,6 +42,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
 import axios from "../lib/axios";
 import { AxiosResponse } from "axios";
 import { useToast } from "@/components/ui/use-toast";
@@ -121,7 +129,9 @@ const Page: React.FC = () => {
   const [resumeFile, setResumeFile] = useState<string | File | null>(null);
   const { toast } = useToast();
   const [query, setQuery] = useState("");
-  const [searching, setSearching] = useState<boolean>(false);
+  const [searching, setSearching] = useState<boolean>(false); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   //handle input change
   const handleInputChange = (event: any) => {
@@ -140,8 +150,8 @@ const Page: React.FC = () => {
   //fetch Technologies data
   const fetchTechnologies = async () => {
     try {
-      const response: AxiosResponse<any> = await axios.get(`/technology`);
-      setTechnologies(response.data.data);
+      const response: AxiosResponse<any> = await axios.get(`/technology?limit=0`);
+      setTechnologies(response.data.data.data);
     } catch (error: any) {
       console.error("Error fetching technologies:", error);
       toast({
@@ -159,10 +169,11 @@ const Page: React.FC = () => {
   const fetchCandidates = async () => {
     try {
       const response: AxiosResponse<any> = await axios.get(
-        `/candidate?filters=${query}`
+        `/candidate?filters=${query}&page=${currentPage}`
       );
-      setCandidates(response.data.data);
+      setCandidates(response.data.data.candidates);
       setSearching(false)
+      setTotalPages(response.data.data.pagination.totalPages);
     } catch (error: any) {
       console.error("Error fetching candidates:", error);
       toast({
@@ -179,7 +190,7 @@ const Page: React.FC = () => {
     } else {
       fetchCandidates();
     }
-  }, [query]);
+  }, [query ,currentPage]);
 
   const debounceFunctionForSearch = _.debounce(async () => {
     await fetchCandidates();
@@ -317,6 +328,11 @@ const Page: React.FC = () => {
     setValue("resume", null);
   };
 
+  const handlePageChange = (page:any) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
   return (
     <>
       <div className="flex ">
@@ -763,6 +779,23 @@ const Page: React.FC = () => {
           </TableBody>
         </Table>
       </div>
+      <Pagination className=" justify-end">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" onClick={() => handlePageChange(currentPage - 1)}  />
+          </PaginationItem>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink href="#" isActive={currentPage === index + 1} onClick={() => handlePageChange(index + 1)}>
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext href="#" onClick={() => handlePageChange(currentPage + 1)} />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </>
   );
 };

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { FaEdit , FaTrash} from "react-icons/fa";
 import { useToast } from "@/components/ui/use-toast";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 
 interface Technology {
@@ -49,7 +50,8 @@ const Page: React.FC = () => {
   const [technologyToDelete, setTechnologyToDelete] = useState<Technology | null>(null);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const { toast }:any = useToast();
-
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const form = useForm({
     resolver: zodResolver(AddTechnologySchema),
@@ -62,9 +64,10 @@ const Page: React.FC = () => {
 
   const fetchTechnologies = async () => {
     try {
-      const response = await axios.get<{ data: Technology[] }>(`/technology`);
+      const response = await axios.get<{ data: Technology[] |any }>(`/technology?page=${page}`);
       // console.log("Fetched technologies:", response.data.data);
-      setTechnologies(response.data.data);
+      setTechnologies(response.data.data?.data);
+      setTotalPages(response.data?.data.meta.totalPages);
     } catch (error:any) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch technologies");
@@ -78,8 +81,14 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     fetchTechnologies();
-  }, []);
+  }, [page]);
 
+  const handlePageChange = (newPage:any) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+    // fetchTechnologies();
+};
   const onSubmit = async (data: { technology_name: string }) => {
     try {
       const isDuplicate = technologies.some(
@@ -113,7 +122,7 @@ const Page: React.FC = () => {
 
   const addTechnology = async (data: { technology_name: string }) => {
     try {
-      const response = await axios.post<{ data: Technology }>(
+      const response = await axios.post<{ data: Technology } |any >(
         `/technology`,
         { technology_name: data.technology_name }
       );
@@ -136,7 +145,7 @@ const Page: React.FC = () => {
     if (!editingTechnology) return;
 
     try {
-     const response =  await axios.put<{ data: Technology }>(
+     const response =  await axios.put<{ data: Technology } |any >(
         `/technology/${editingTechnology._id}`,
         { technology_name: data.technology_name }
       );
@@ -270,8 +279,25 @@ const Page: React.FC = () => {
             )}
           </TableBody>
         </Table>
+       
       </div>
-
+      <Pagination className=" justify-end pt-4">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" onClick={() => handlePageChange(page - 1)}  aria-disabled={page ===1} />
+          </PaginationItem>
+          {[...Array(totalPages)].map((_, index) => (
+                        <PaginationItem key={index}>
+                            <PaginationLink href="#" onClick={() => handlePageChange(index + 1)} isActive={page === index + 1}>
+                                {index + 1}
+                            </PaginationLink>
+                        </PaginationItem>
+                    ))}
+          <PaginationItem>
+            <PaginationNext href="#" onClick={() => handlePageChange(page + 1)}  aria-disabled={page === totalPages} />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
       {technologyToDelete && (
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogTrigger asChild>

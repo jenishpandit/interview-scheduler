@@ -84,7 +84,7 @@ const TodayInterview: React.FC<TodayInterviewProps> = ({ Gettecnology, selectedT
             ? "bg-background text-foreground shadow-sm"
             : "disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
             }`}
-          onClick={() => setSelectedTab("today")}
+          onClick={() => setSelectedTab("today")} 
         >
           today
         </TabsTrigger>

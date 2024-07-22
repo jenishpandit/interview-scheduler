@@ -50,10 +50,6 @@ const page = () => {
   }, []);
   const InterviewFetch = async (tab:any) => {
     try {
-      let endpoint:string;
-      // if (tab === "Today") {
-      //   endpoint = "/interview?date=today";
-      // }
       const res = await axios.get(`/interview?filter=${tab}`);
       
       setInterview(res.data.data);
@@ -68,7 +64,7 @@ const page = () => {
   const fetchTechnology = async () => {
     try {
       const res = await axios.get("/technology");
-      // console.log("Fetched data tech:", res.data.data);
+      
       setTechnologies(res.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -77,12 +73,6 @@ const page = () => {
   useEffect(() => {
     fetchTechnology();
   }, []);
-
-  useEffect(() => {// Update filtered interviews when tab changes
-  }, [selectedTab, getinterview]);
-
-// console.log(getinterview);
-  //  console.log("=======",getinterview)
   return (
     <>
       <div className="flex justify-between items-center p-4 pt-6 border-b border-gray-300">
@@ -101,7 +91,7 @@ const page = () => {
             Icon={<Cpu />}
           ></DashbordCard>
           <DashbordCard
-            title="interview Total"
+            title="Interview Total"
             value={dashboard?.interviewTotal}
             Icon={<Laptop />}
           ></DashbordCard>
